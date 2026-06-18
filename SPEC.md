@@ -20,6 +20,7 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 - archive: `SPEC.archive.md` @ repo root (optional) → immutable §T/§B/§V.retired rows
 - renumber-map: `.opencode/spec-renumber-map.json` → append-only renumber history (written by reorganize, read by explain)
 - clusters: `.opencode/spec-clusters.json` → reorganize cluster state
+- check-state: `.opencode/check-state.json` → check skill memo (auto-committed on clean run per V32)
 
 ## §V INVARIANTS
 V1: sole-source-of-truth — SPEC.md @ repo root sole live spec; not split, not docs/ tree, not JSON sidecars.
@@ -53,6 +54,7 @@ V28: token-budget — SPEC.md token estimate `bytes/3.4`; >20k-token advisory tr
 V29: token-budget-condense — token overflow resolved via archive sibling (SPEC.archive.md); archive carries immutable §T/§B/§V.retired rows; condense prunes history residue across live §V/§T/§B bodies.
 V30: backprop-protocol — bug → spec skill BACKPROP records §B (+ §V if recurrence-class catchable) → build adds failing test named after invariant → fix code → commit citing §B/§V.
 V31: monitor-protocol — skill-deviation auto-fire: REDACT (mandatory pre-publish) → ROUTE (dev repo → backprop hand-off, consumer repo → GitHub issue) → GATE (AskUserQuestion) → WRITE; no auto-file path; pre-write `--repo` assert.
+V32: check-memo-commit — on clean audit (V17 memo-gate: no VIOLATE/UNVERIFIABLE/UNRESOLVED/TYPE-MISMATCH/DRIFT/MISSING/STALE/EXTRA), check skill auto-commits `.opencode/check-state.json` (path-scoped per V24), no operator prompt; exemption to V20 read-only-diagnostic for this file only.
 
 ## §T TASKS
 id|status|task|cites
