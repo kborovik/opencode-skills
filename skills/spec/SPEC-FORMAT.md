@@ -29,7 +29,7 @@ SPEC.md and this file is LLM-facing so telegraph register per `skills/telegraph/
 
 ### §I row
 
-One line, bullet optional. Opens `<kind>:` w/ kind in `[a-z_][a-z0-9_]*`:
+One line, bullet optional. Opens `<kind>:` w/ kind in `[a-z_][a-z0-9_-]*`:
 
 ```
 - <kind>: <name> → <shape>

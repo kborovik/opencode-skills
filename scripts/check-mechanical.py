@@ -157,7 +157,7 @@ B_ROW = re.compile(r"^(B\d+)\|")
 # → `I.api`), bullet optional; kind charset matches CITE_TOKEN's I-token
 # grammar so every emitted id is citable from §T.cites. Prose lines without
 # a kind opener carry no id.
-I_KIND = re.compile(r"^\s*(?:-\s+)?([a-z_][a-z0-9_]*):\s")
+I_KIND = re.compile(r"^\s*(?:-\s+)?([a-z_][a-z0-9_-]*):\s")
 ID_NUM = re.compile(r"^([VTB])(\d+)$")
 CITE_TOKEN = re.compile(r"^(V\d+|T\d+|B\d+|I\.[a-z_][a-z0-9_]*|-)$")
 FIX_TOKEN = re.compile(r"^(V\d+|-)$")
@@ -2269,6 +2269,26 @@ def selftest():
     check(
         [r[0] for r in parsed] == skel and all(v == "" for _, v, _ in parsed),
         "emit-row-ids: pipe-table parses for fill-verdicts hand-off",
+    )
+    # emit-row-ids: hyphenated §I kinds extracted (renumber-map, check-state)
+    isec_hy = (
+        "## §I INTERFACES\n"
+        "- renumber-map: `.opencode/spec-renumber-map.json` → append-only history\n"
+        "check-state: `.opencode/check-state.json` → check memo\n"
+        "- `renumber-map` lead backtick → no id\n"
+        "- check-state: dup → first-wins dedup\n"
+        "## §V INVARIANTS\n"
+    )
+    ih_secs, _ = parse_sections(isec_hy)
+    ih_ids = parse_i_ids(ih_secs)
+    check(
+        [r["id"] for r in ih_ids] == ["I.renumber-map", "I.check-state"],
+        "emit-row-ids: hyphenated §I kinds extracted; backtick-lead + dup excluded",
+    )
+    skel_hy = emit_row_ids([], ih_ids, [])
+    check(
+        skel_hy == ["I.renumber-map", "I.check-state"],
+        "emit-row-ids: skeleton preserves hyphenated §I ids verbatim",
     )
 
     # emit-overview: non-§V sections verbatim + §V id list only (no bodies)

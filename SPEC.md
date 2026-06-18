@@ -65,7 +65,7 @@ T4|x|author `scripts/install.sh` — global deploy per install-model: `git clone
 T5|x|move `install.sh` from `scripts/` to repo root; refresh bootstrap URL + test-script path; preserve T4 closure history|I.script
 T6|x|add `commands/sdd-explain.md` — slash command mirroring explain skill (description-only frontmatter distilled from `skills/explain/SKILL.md`, body delegates via `invoke the explain skill $ARGUMENTS`) per V9 response-shape contract|I.cmd,V9
 T7|x|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.script,V26
-T8|. |fix `scripts/check-mechanical.py` `emit-row-ids` §I extraction — drops hyphenated kinds (`renumber-map`, `check-state`); V13 regex single source of truth|V13
+T8|x|fix `scripts/check-mechanical.py` `emit-row-ids` §I extraction — drops hyphenated kinds (`renumber-map`, `check-state`); V13 regex single source of truth|V13
 
 ## §B BUGS
 id|date|cause|fix
