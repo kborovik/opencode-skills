@@ -30,12 +30,12 @@ V5: cite-resolution — cite-DAG edges: §T.cites→§V, §B.fix→§V, inline �
 V6: fold-first-authoring — new §V row triggers decision-gate: fold into closest existing row vs split; split requires §B recurrence-class cite or orthogonal-concept declaration.
 V7: design-lifecycle — design file persists in working tree post-fold-in; spec fold-in mutates SPEC.md only; user removes or preserves design file manually.
 V8: skills-only — no hooks / runtime interception; skills are LLM self-report wrappers, not interceptors.
-V9: response-shape — user-typeable SKILL.md carries `## Next` block (1–5 atomic positional-dispatch items); recipe ends at commit, dispatch is operator turn.
+V9: response-shape — user-typeable SKILL.md carries `## Next` block (1–5 atomic positional-dispatch items); recipe ends at commit, dispatch is operator turn; exception `commit` skill w/o follow-up dispatch surface — `## Next` block optional (closes §B.2).
 V10: sub-skill-flags — internal sub-skills (telegraph, backprop, socratic, steno, monitor) not directly invocable; auto-fire or programmatic only; description opens "Internal — not for direct invocation".
 V11: dispatch — recipe-step-no-dispatch: skills never self-dispatch other skills mid-run; skill hand-off expressed only via `## Next` positional items, operator dispatches next turn.
 V12: published-scope — PUBLISHED scope (skills/, commands/, scripts/, SPEC-FORMAT.md) bans pinned numeric §-cites (`§V.7`); use placeholder form (`§V.<n>`) or inline rule embedding.
 V13: mechanical-realization — deterministic audit rules realized once in check-mechanical.py; not re-paraphrased per run; script regex is single source of truth; LLM re-derivation forbidden.
-V14: mechanize-scan — every user-invocable SKILL.md carries byte-identical canonical MECHANIZE block; script audits byte-identity (DRIFT/MISSING) across the user-invocable set.
+V14: mechanize-scan — every user-invocable SKILL.md carries byte-identical canonical MECHANIZE block; script audits byte-identity (DRIFT/MISSING) across the user-invocable set; exempt internal sub-skills w/o corresponding slash-command (`backprop`, `monitor`, `socratic`, `steno`, `telegraph`) — MECHANIZE block inapplicable when no command dispatch follows (closes §B.1).
 V15: scope-set — scope vocabulary {PUBLISHED, REPO-LOCAL, SPEC-ADJACENT, GITHUB-FACING}; invariants reduce audit touch-set; default full repo.
 V16: drift-verdict-vocab — verdicts in {HOLD, VIOLATE, VIOLATE-CAPTURED, UNVERIFIABLE, SCOPE-EMPTY, HOLD-SINCE-CLEAN, LATENT}; format violations emit VIOLATE w/ `format:` evidence prefix.
 V17: memo — check skill memo in REPO-LOCAL `.opencode/`; script owns both write + read ends; cache, not source of truth; invalidation on touched-set/diff change.
