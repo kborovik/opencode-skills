@@ -14,7 +14,7 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 ## §I INTERFACES
 - skill: `skills/<name>/SKILL.md` → 13 skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
 - cmd: `commands/sdd-*.md` → 6 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize)
-- script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `emit-overview`, `emit-v-slices`, `emit-superseded`, `--self-test`; deployed `~/.opencode/scripts/`
+- script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `emit-overview`, `emit-v-slices`, `emit-superseded`, `emit-row-ids`, `write-memo`, `--self-test`; deployed `~/.opencode/scripts/`
 - format: `skills/spec/SPEC-FORMAT.md` → structural format reference (row schemas, section catalog, citation forms, archive sibling); consumed by spec/check/condense/reorganize via direct Read
 - spec: `SPEC.md` @ repo root → sole live spec; authored by spec skill only
 - archive: `SPEC.archive.md` @ repo root (optional) → immutable §T/§B/§V.retired rows
@@ -62,3 +62,5 @@ T3|.|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-toolin
 
 ## §B BUGS
 id|date|cause|fix
+B1|2026-06-17|check-mechanical.py mechanize-scan false-positive on internal sub-skills — YAML block-scalar description continuation lines not parsed, 5 internal sub-skills flagged user-invocable MISSING despite V10-compliant descriptions|V13,V14
+B2|2026-06-17|skills/commit/SKILL.md authored incomplete — missing MECHANIZE block, missing Next block, non-path-scoped commit command|V9,V14,V24
