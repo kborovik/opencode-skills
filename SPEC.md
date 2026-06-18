@@ -10,13 +10,13 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 - Skills cross-referential — all 13 ship together or references dangle.
 - LLM-facing surfaces (SPEC.md, SPEC-FORMAT.md, skill bodies) telegraph register; human-facing (README, issues, operator prose) steno.
 - `check-mechanical.py` zero-dep (stdlib `hashlib`/`json` only); owns mechanical audits + memo + self-test.
-- install model — global install: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; updates via `git pull` in clone target flow through symlinks; `install.sh` curl-bootstrappable from repo `main`.
+- install model — global install: `git clone` to `~/.local/share/opencode-skills/` + per-file symlink for each entry under `<clone>/skills/`, `<clone>/commands/`, `<clone>/scripts/` into per-consumer target dirs (`~/.config/opencode/skills/<name>`, `~/.config/opencode/commands/<name>`, `~/.opencode/scripts/<name>`); updates via `git pull` in clone target flow through symlinks; `install.sh` curl-bootstrappable from repo `main`.
 
 ## §I INTERFACES
 - skill: `skills/<name>/SKILL.md` → 13 skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
 - cmd: `commands/sdd-*.md` → 7 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize, sdd-explain)
 - script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `emit-overview`, `emit-v-slices`, `emit-superseded`, `emit-row-ids`, `write-memo`, `--self-test`; deployed `~/.opencode/scripts/`
-- script: `install.sh` → global deploy: `git clone` to `~/.local/share/opencode-skills/` (skip if exists) + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent re-run, `curl | sh` bootstrap supported
+- script: `install.sh` → global deploy: `git clone` to `~/.local/share/opencode-skills/` (skip if exists) + per-file symlink for each `<clone>/skills/<name>` → `~/.config/opencode/skills/<name>`, `<clone>/commands/<name>` → `~/.config/opencode/commands/<name>`, `<clone>/scripts/<name>` → `~/.opencode/scripts/<name>`; idempotent re-run, `curl | sh` bootstrap supported
 - format: `skills/spec/SPEC-FORMAT.md` → structural format reference (row schemas, section catalog, citation forms, archive sibling); consumed by spec/check/condense/reorganize via direct Read
 - spec: `SPEC.md` @ repo root → sole live spec; authored by spec skill only
 - archive: `SPEC.archive.md` @ repo root (optional) → immutable §T/§B/§V.retired rows
@@ -64,6 +64,7 @@ T3|x|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-toolin
 T4|x|author `scripts/install.sh` — global deploy per install-model: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent, `curl | sh` bootstrap|I.script,V26
 T5|x|move `install.sh` from `scripts/` to repo root; refresh bootstrap URL + test-script path; preserve T4 closure history|I.install-sh
 T6|x|add `commands/sdd-explain.md` — slash command mirroring explain skill (description-only frontmatter distilled from `skills/explain/SKILL.md`, body delegates via `invoke the explain skill $ARGUMENTS`) per V9 response-shape contract|I.cmd,V9
+T7|.|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.install-sh,V26
 
 ## §B BUGS
 id|date|cause|fix
