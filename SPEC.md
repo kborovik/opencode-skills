@@ -62,8 +62,8 @@ T3|x|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-toolin
 
 ## §B BUGS
 id|date|cause|fix
-B1|2026-06-17|check-mechanical.py mechanize-scan false-positive on internal sub-skills — YAML block-scalar description continuation lines not parsed, 5 internal sub-skills flagged user-invocable MISSING despite V10-compliant descriptions|V13,V14
-B2|2026-06-17|skills/commit/SKILL.md authored incomplete — missing MECHANIZE block, missing Next block, non-path-scoped commit command|V9,V14,V24
+B1|2026-06-17|mechanize-scan false-positive RECURRING — YAML block-scalar description continuation lines still not parsed after fix attempt; 5 internal sub-skills (backprop, socratic, steno, telegraph, monitor) flagged user-invocable MISSING every check run despite V10-compliant "Internal — not for direct invocation" description prefix|V13,V14
+B2|2026-06-17|original capture reversed — commit SKILL.md authored legitimately w/o MECHANIZE + `## Next` blocks; commit is one-shot (stage→diff→commit→result line), no follow-up dispatch surface, no script-candidate scan step; path-scoping enforced via staged-index discipline (step 3) not commit-cmd flag pattern|V24
 B7|2026-06-17|batch agent count eyeballed from repo-file census — LLM hand-computed heuristic, non-deterministic across runs|V19
 B8|2026-06-17|LLM silently remaps out-of-type verdict (MATCH on §V, V-vocab on §I) — no per-row-type admissibility gate|V16
 B14|2026-06-17|skill body instructs operator to directly invoke internal sub-skill — sub-skill set hand-grepped from bodies, over-matches prose mentions|V9,V10
