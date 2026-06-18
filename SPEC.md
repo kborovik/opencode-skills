@@ -23,7 +23,7 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 
 ## §V INVARIANTS
 V1: sole-source-of-truth — SPEC.md @ repo root sole live spec; not split, not docs/ tree, not JSON sidecars.
-V2: monotonic-numbering — V<n>/T<n>/B<n> ids strictly increasing per section in doc order; gaps allowed (closure history); reuse forbidden. (? aliases monotonic-id `?`)
+V2: monotonic-numbering — V<n>/T<n>/B<n> ids strictly increasing per section in doc order; gaps allowed (closure history); reuse forbidden.
 V3: freshness-contract — SPEC.md is clean current design; history lives in commit log + SPEC.archive.md; no inlined amendment-counters, dated-retirement clauses, or supersession-narration in live rows.
 V4: status-flip — build skill flips §T status cell only (`.`↔`x`); task body not rewritten at status change.
 V5: cite-resolution — cite-DAG edges: §T.cites→§V, §B.fix→§V, inline §V.<n> in §V/§C/§I→§V (cross-ref); check audits resolution + edge-type; spec mutation sweeps citers via edge-type traversal.
@@ -33,7 +33,7 @@ V8: skills-only — no hooks / runtime interception; skills are LLM self-report 
 V9: response-shape — user-typeable SKILL.md carries `## Next` block (1–5 atomic positional-dispatch items); recipe ends at commit, dispatch is operator turn.
 V10: sub-skill-flags — internal sub-skills (telegraph, backprop, socratic, steno, monitor) not directly invocable; auto-fire or programmatic only; description opens "Internal — not for direct invocation".
 V11: dispatch — recipe-step-no-dispatch: skills never self-dispatch other skills mid-run; skill hand-off expressed only via `## Next` positional items, operator dispatches next turn.
-V12: published-scope — PUBLISHED scope (skills/, commands/, scripts/, SPEC-FORMAT.md) bans pinned numeric §-cites (`§V.7`); use placeholder form (`§V.<n>`) or inline rule embedding. (? aliases published-tooling `?`)
+V12: published-scope — PUBLISHED scope (skills/, commands/, scripts/, SPEC-FORMAT.md) bans pinned numeric §-cites (`§V.7`); use placeholder form (`§V.<n>`) or inline rule embedding.
 V13: mechanical-realization — deterministic audit rules realized once in check-mechanical.py; not re-paraphrased per run; script regex is single source of truth; LLM re-derivation forbidden.
 V14: mechanize-scan — every user-invocable SKILL.md carries byte-identical canonical MECHANIZE block; script audits byte-identity (DRIFT/MISSING) across the user-invocable set.
 V15: scope-set — scope vocabulary {PUBLISHED, REPO-LOCAL, SPEC-ADJACENT, GITHUB-FACING}; invariants reduce audit touch-set; default full repo.
@@ -43,7 +43,7 @@ V18: single-load — check loads SPEC.md via script `emit-overview` (scope, not 
 V19: batch — batch count script-computed from §V row count + PUBLISHED file census; `n=1` → main-thread single-agent; sub-agent parallel audit for `n>1`.
 V20: read-only-diagnostic — check/explain read-only; sub-agent delegation safe; never mutate SPEC.md or code.
 V21: tooling-preference — builtin Grep tool preferred over shell `grep`/`rg`; `grep -v -E` for invert scans; dedicated tools over shell pipes.
-V22: verbatim-preservation — backtick-wrapped tokens, code, paths, URLs, identifiers, error strings, regex preserved verbatim; not pruned, not `\|`-escaped. (? aliases verbatim `?`)
+V22: verbatim-preservation — backtick-wrapped tokens, code, paths, URLs, identifiers, error strings, regex preserved verbatim; not pruned, not `\|`-escaped.
 V23: decision-gate — AskUserQuestion before any gh write or irrecoverable branch; mutually-exclusive action labels; no auto-file path.
 V24: write-ownership — commits path-scoped (`git commit -m <subj> [-m <body>] -- <paths>`); pre-staged files never leak; `-m` flags precede `--`.
 V25: write-serialize — SPEC.md-mutating writes serialize on main thread; classification/audit reads delegable to sub-agents.
