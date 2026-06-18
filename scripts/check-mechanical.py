@@ -40,10 +40,12 @@ for cross-format compatibility).
                 and merge it (stdin = behavioral rows only, hand-merge banned).
                 Validate the verdict vocab per row type, compute clean-set
                 membership itself, and write the run memo (schema v3, per-row §V
-                hashes, oversized-cell ack) plus the `.gitignore` guard — only
-                when the run is clean. The model never decides "clean". Exit
-                0 = clean, 1 = dirty (memo untouched, CI-gateable), 2 = invalid
-                vocab.
+                hashes, oversized-cell ack) — only when the run is clean. The
+                model never decides "clean". Exit 0 = clean, 1 = dirty (memo
+                untouched, CI-gateable), 2 = invalid vocab. The `.gitignore`
+                guard is no longer written — check-memo-commit mandates the
+                memo be auto-committed on clean runs, so the file is tracked,
+                not ignored.
   emit-v-slices — read SPEC.md, print every §V row body with its source line
                 range (`## V<n> SPEC.md:<start>-<end>` header + verbatim row
                 text). Optional `--dirty V<n>,...` restricts to named rows
@@ -1792,18 +1794,10 @@ def memo_exit_code(rows):
 
 
 def ensure_gitignore_guard(repo_root):
-    path = os.path.join(repo_root, ".opencode", ".gitignore")
-    line = "check-state.json"
-    existing = ""
-    if os.path.exists(path):
-        existing = read_text(path)
-        if any(l.strip() == line for l in existing.splitlines()):
-            return
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "a", encoding="utf-8") as f:
-        if existing and not existing.endswith("\n"):
-            f.write("\n")
-        f.write(line + "\n")
+    # No-op as of check-memo-commit: .opencode/check-state.json is auto-committed
+    # on clean runs. The legacy ignore guard would block `git add` of the memo file;
+    # the function is preserved for call-site stability and as a future extension point.
+    return
 
 
 def cmd_write_memo(args):
