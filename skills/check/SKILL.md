@@ -264,7 +264,7 @@ git commit -m "check: memo @ <short-sha>" \
            -- .opencode/check-state.json
 ```
 
-Path-scoped per write-ownership (`-m` flags precede `--`); pre-staged files never leak. Pre-flight: `git diff --cached --quiet -- .opencode/check-state.json` AND `git diff --quiet HEAD -- .opencode/check-state.json` → both quiet → no-op (file identical to HEAD, skip commit silently). On dirty run (`write-memo` exit 1) → no auto-commit (check-memo-commit gate unsatisfied); checkpoint section omits commit line. No new operator `## Next` item — auto-commit is internal mutation, not a dispatch surface.
+Path-scoped per write-ownership (`-m` flags precede `--`); pre-staged files never leak. Pre-flight: `git status --porcelain -- .opencode/check-state.json` → empty = no-op (tracked file clean vs HEAD, skip commit silently). `git add` is run unconditionally before the commit (idempotent — no-op if file already staged at HEAD content); for a previously-untracked file this transitions it to staged and the commit creates the tracking entry. On dirty run (`write-memo` exit 1) → no auto-commit (check-memo-commit gate unsatisfied); checkpoint section omits commit line. No new operator `## Next` item — auto-commit is internal mutation, not a dispatch surface.
 
 ## REMEDY HINTS
 
