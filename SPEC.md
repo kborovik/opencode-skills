@@ -61,7 +61,7 @@ V32: check-memo-commit — on clean audit (V17 memo-gate: no VIOLATE/UNVERIFIABL
 ## §T TASKS
 id|status|task|cites
 T3|x|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-tooling, V22 verbatim) — single row or split?|V2,V12,V22
-T4|.|author `scripts/install.sh` — global deploy per install-model: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent, `curl | sh` bootstrap|I.script,V26
+T4|x|author `scripts/install.sh` — global deploy per install-model: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent, `curl | sh` bootstrap|I.script,V26
 
 ## §B BUGS
 id|date|cause|fix
