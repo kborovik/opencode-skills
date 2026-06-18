@@ -64,3 +64,6 @@ T3|.|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-toolin
 id|date|cause|fix
 B1|2026-06-17|check-mechanical.py mechanize-scan false-positive on internal sub-skills — YAML block-scalar description continuation lines not parsed, 5 internal sub-skills flagged user-invocable MISSING despite V10-compliant descriptions|V13,V14
 B2|2026-06-17|skills/commit/SKILL.md authored incomplete — missing MECHANIZE block, missing Next block, non-path-scoped commit command|V9,V14,V24
+B7|2026-06-17|batch agent count eyeballed from repo-file census — LLM hand-computed heuristic, non-deterministic across runs|V19
+B8|2026-06-17|LLM silently remaps out-of-type verdict (MATCH on §V, V-vocab on §I) — no per-row-type admissibility gate|V16
+B14|2026-06-17|skill body instructs operator to directly invoke internal sub-skill — sub-skill set hand-grepped from bodies, over-matches prose mentions|V9,V10
