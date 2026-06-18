@@ -25,7 +25,7 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 V1: sole-source-of-truth — SPEC.md @ repo root sole live spec; not split, not docs/ tree, not JSON sidecars.
 V2: monotonic-numbering — V<n>/T<n>/B<n> ids strictly increasing per section in doc order; gaps allowed (closure history); reuse forbidden.
 V3: freshness-contract — SPEC.md is clean current design; history lives in commit log + SPEC.archive.md; no inlined amendment-counters, dated-retirement clauses, or supersession-narration in live rows.
-V4: status-flip — build skill flips §T status cell only (`.`↔`x`); task body not rewritten at status change.
+V4: status-flip — build skill flips §T status cell only (`.`↔`x`); task body not rewritten at status change; flip is the §T-row closure record, decision + work live in prior spec/code commits (body unchanged per §V.3 freshness-contract).
 V5: cite-resolution — cite-DAG edges: §T.cites→§V, §B.fix→§V, inline §V.<n> in §V/§C/§I→§V (cross-ref); check audits resolution + edge-type; spec mutation sweeps citers via edge-type traversal.
 V6: fold-first-authoring — new §V row triggers decision-gate: fold into closest existing row vs split; split requires §B recurrence-class cite or orthogonal-concept declaration.
 V7: design-lifecycle — design file persists in working tree post-fold-in; spec fold-in mutates SPEC.md only; user removes or preserves design file manually.
