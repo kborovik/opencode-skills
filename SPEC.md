@@ -6,15 +6,17 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 ## §C CONSTRAINTS
 - MIT license; opencode-native frontmatter (`name`, `description`, `license: MIT`, `compatibility: opencode`); skill dir name == frontmatter name.
 - No global opencode config shipped (consumer responsibility).
-- `check` skill references `~/.opencode/scripts/check-mechanical.py` via hardcoded path — deploy step required for check to function.
+- `check` skill references `~/.opencode/scripts/check-mechanical.py` via hardcoded path — `scripts/install.sh` deploys script there; required for `check` to function.
 - Skills cross-referential — all 13 ship together or references dangle.
 - LLM-facing surfaces (SPEC.md, SPEC-FORMAT.md, skill bodies) telegraph register; human-facing (README, issues, operator prose) steno.
 - `check-mechanical.py` zero-dep (stdlib `hashlib`/`json` only); owns mechanical audits + memo + self-test.
+- install model — global install: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; updates via `git pull` in clone target flow through symlinks; `install.sh` curl-bootstrappable from repo `main`.
 
 ## §I INTERFACES
 - skill: `skills/<name>/SKILL.md` → 13 skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
 - cmd: `commands/sdd-*.md` → 6 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize)
 - script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `emit-overview`, `emit-v-slices`, `emit-superseded`, `emit-row-ids`, `write-memo`, `--self-test`; deployed `~/.opencode/scripts/`
+- script: `scripts/install.sh` → global deploy: `git clone` to `~/.local/share/opencode-skills/` (skip if exists) + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent re-run, `curl | sh` bootstrap supported
 - format: `skills/spec/SPEC-FORMAT.md` → structural format reference (row schemas, section catalog, citation forms, archive sibling); consumed by spec/check/condense/reorganize via direct Read
 - spec: `SPEC.md` @ repo root → sole live spec; authored by spec skill only
 - archive: `SPEC.archive.md` @ repo root (optional) → immutable §T/§B/§V.retired rows
@@ -61,6 +63,7 @@ id|status|task|cites
 T1|.|reconcile pinned `§B.<n>` prose cites in PUBLISHED skill bodies vs published-scope ban (§B.7/§B.8/§B.14 referenced in skills/ + scripts/ comments)|V12
 T2|.|reconstruct §B.7, §B.8, §B.14 rows from skill-body + check-mechanical.py references (cause/fix/date TBD w/ user)|V5,V13
 T3|x|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-tooling, V22 verbatim) — single row or split?|V2,V12,V22
+T4|.|author `scripts/install.sh` — global deploy per install-model: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent, `curl | sh` bootstrap|I.script,V26
 
 ## §B BUGS
 id|date|cause|fix
