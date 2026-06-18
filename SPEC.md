@@ -14,7 +14,7 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 
 ## §I INTERFACES
 - skill: `skills/<name>/SKILL.md` → 13 skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
-- cmd: `commands/sdd-*.md` → 6 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize)
+- cmd: `commands/sdd-*.md` → 7 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize, sdd-explain)
 - script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `emit-overview`, `emit-v-slices`, `emit-superseded`, `emit-row-ids`, `write-memo`, `--self-test`; deployed `~/.opencode/scripts/`
 - script: `install.sh` → global deploy: `git clone` to `~/.local/share/opencode-skills/` (skip if exists) + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent re-run, `curl | sh` bootstrap supported
 - format: `skills/spec/SPEC-FORMAT.md` → structural format reference (row schemas, section catalog, citation forms, archive sibling); consumed by spec/check/condense/reorganize via direct Read
@@ -63,6 +63,7 @@ id|status|task|cites
 T3|x|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-tooling, V22 verbatim) — single row or split?|V2,V12,V22
 T4|x|author `scripts/install.sh` — global deploy per install-model: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent, `curl | sh` bootstrap|I.script,V26
 T5|x|move `install.sh` from `scripts/` to repo root; refresh bootstrap URL + test-script path; preserve T4 closure history|I.install-sh
+T6|.|add `commands/sdd-explain.md` — slash command mirroring explain skill (description-only frontmatter distilled from `skills/explain/SKILL.md`, body delegates via `invoke the explain skill $ARGUMENTS`) per V9 response-shape contract|I.cmd,V9
 
 ## §B BUGS
 id|date|cause|fix
