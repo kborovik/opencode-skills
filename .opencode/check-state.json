@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "last_clean_sha": "66be4577aa7cb2c7f6dafe46b43a9272b1ccc343",
+  "last_clean_sha": "6ea91ff4c043f1e44154e7adcd3e20dc04c0f6f2",
   "v_row_shas": {
     "V1": "93d870fce94b7cdfa03119b8f154459626d6a78fd94d52f9e0edbe76e6e4679a",
     "V2": "7af8e695b530ce00160ec26c25f4fa01e01c073d33350768b5e9330d70deb949",
@@ -35,7 +35,7 @@
     "V31": "0b35c110dcdc687f928449ee7bdbb0882be2aecade5bd6d96397a2f15c1c6b1c",
     "V32": "0eeda42610ed58e4429a4a7e0789dedd9e14802b13b718d6b81d0f005d2f7a63"
   },
-  "last_run_at": "2026-06-18T15:09:11Z",
+  "last_run_at": "2026-06-18T15:10:17Z",
   "last_v_classifications": {},
   "oversized_cell_ack": "5ac43d3ea0e73760255c20f72a3b011af3c22692531c0b6b16b21d35ad32eead"
 }
