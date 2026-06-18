@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test-install.sh — smoke test for scripts/install.sh.
+# test-install.sh — smoke test for install.sh (repo root).
 #
 # Validates:
 #   I.install-sh — deploy shape (clone dir + three symlinks), idempotent re-run,
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALL_SH="${HERE}/install.sh"
+INSTALL_SH="${HERE}/../install.sh"
 
 fail() { printf 'not ok %s\n' "$*" >&2; exit 1; }
 ok()   { printf 'ok  %s\n' "$*"; }
