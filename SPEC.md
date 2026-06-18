@@ -57,7 +57,7 @@ V31: monitor-protocol — skill-deviation auto-fire: REDACT (mandatory pre-publi
 ## §T TASKS
 id|status|task|cites
 T1|x|reconcile pinned `§B.<n>` prose cites in PUBLISHED skill bodies vs published-scope ban (§B.7/§B.8/§B.14 referenced in skills/ + scripts/ comments)|V12
-T2|.|reconstruct §B.7, §B.8, §B.14 rows from skill-body + check-mechanical.py references (cause/fix/date TBD w/ user)|V5,V13
+T2|x|reconstruct §B.7, §B.8, §B.14 rows from skill-body + check-mechanical.py references (cause/fix/date TBD w/ user)|V5,V13
 T3|.|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-tooling, V22 verbatim) — single row or split?|V2,V12,V22
 
 ## §B BUGS
