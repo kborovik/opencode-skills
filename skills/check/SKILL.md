@@ -13,7 +13,7 @@ compatibility: opencode
 
 # check — drift report
 
-Pure diagnostic. Reports violations; writes nothing to SPEC or code; user decides remedy. Only sibling state: memo + `.gitignore` guard in REPO-LOCAL `.opencode/` (cache, not source of truth — code + SPEC.md are truth). Mechanical audits owned by published script per mechanical-realization invariant — never re-derive its greps per run. Behavioral judgment stays LLM. Recipes parametric per parametric-recipe invariant — repo-specific extensions: `.opencode/scripts/check-extras.sh` hook (mechanical, run by script) + `.opencode/check-extras.md` (judgment-class, consulted by LLM). Read-only → sub-agent delegation safe throughout.
+Pure diagnostic. Reports violations; writes nothing to SPEC or code except auto-commit of `.opencode/check-state.json` on clean run per check-memo-commit (carve-out to read-only-diagnostic); user decides other remedies. Only sibling state: memo + `.gitignore` guard in REPO-LOCAL `.opencode/` (cache, not source of truth — code + SPEC.md are truth). Mechanical audits owned by published script per mechanical-realization invariant — never re-derive its greps per run. Behavioral judgment stays LLM. Recipes parametric per parametric-recipe invariant — repo-specific extensions: `.opencode/scripts/check-extras.sh` hook (mechanical, run by script) + `.opencode/check-extras.md` (judgment-class, consulted by LLM). Read-only → sub-agent delegation safe throughout.
 
 ## LOAD
 
@@ -217,10 +217,10 @@ Silence-class verdicts excluded from body — collapsed in summary `suppressed` 
 §B.<n> VIOLATE: history: amendment-counter @ SPEC.md:<line>
 ```
 
-**Checkpoint** — clean-run REPORT ! contain `## checkpoint` H2 reflecting `write-memo` outcome, single line before `## summary` (state mutation needs salient signal, not buried prose):
+**Checkpoint** — clean-run REPORT ! contain `## checkpoint` H2 reflecting `write-memo` + `AUTO-COMMIT` outcome, single line before `## summary` (state mutation needs salient signal, not buried prose):
 
-- memo advanced → `clean → memo <old-sha> → <new-sha>`
-- memo unchanged (HEAD not shifted) → `clean — memo @ <sha>`
+- memo advanced + auto-commit landed → `clean → memo <old-sha> → <new-sha> → commit <commit-sha>`
+- memo unchanged (no auto-commit needed) → `clean — memo @ <sha>`
 - dirty run (any VIOLATE / DRIFT / MISSING / STALE / UNRESOLVED / TYPE-MISMATCH) → omit section.
 
 **Advisory** — fired conditions ! emit `## advisory` H2 between `## checkpoint` and `## summary` (or leading output when no checkpoint). One line per fired `token|ADVISORY` / `memo|ADVISORY` / `history|ADVISORY` row. No line → omit heading.
@@ -252,6 +252,19 @@ python3 ~/.opencode/scripts/check-mechanical.py write-memo --from-audit < <fille
 ```
 
 Script merges its internal mechanical audit w/ the behavioral rows, validates vocab per row type, computes clean-set membership (clean iff no VIOLATE / UNVERIFIABLE / UNRESOLVED / TYPE-MISMATCH / DRIFT / MISSING / STALE / EXTRA), writes memo only when clean (schema v3, per-row hashes, `last_clean_sha` = HEAD, oversized-cell ack, `.gitignore` guard). Exit `0` = clean (memo advanced); `1` = dirty (memo untouched, offenders on stderr — CI-gateable); `2` = invalid vocab. `## checkpoint` line reflects the outcome.
+
+## AUTO-COMMIT (check-memo-commit)
+
+On clean audit (`write-memo` exit 0) → auto-commit `.opencode/check-state.json` w/o operator prompt (check-memo-commit carve-out to read-only-diagnostic for this file only):
+
+```bash
+git add .opencode/check-state.json
+git commit -m "check: memo @ <short-sha>" \
+           -m "auto-advance check memo on clean run (check-memo-commit)" \
+           -- .opencode/check-state.json
+```
+
+Path-scoped per write-ownership (`-m` flags precede `--`); pre-staged files never leak. Pre-flight: `git diff --cached --quiet -- .opencode/check-state.json` AND `git diff --quiet HEAD -- .opencode/check-state.json` → both quiet → no-op (file identical to HEAD, skip commit silently). On dirty run (`write-memo` exit 1) → no auto-commit (check-memo-commit gate unsatisfied); checkpoint section omits commit line. No new operator `## Next` item — auto-commit is internal mutation, not a dispatch surface.
 
 ## REMEDY HINTS
 
@@ -307,6 +320,6 @@ Variants: clean + pending `.` task → invoke the build skill with `--next` + in
 
 ## NON-GOALS
 
-- Zero writes to SPEC or code. Memo + `.gitignore` guard written by the script's `write-memo` mode only.
+- Zero writes to SPEC or code except `.opencode/check-state.json` auto-commit on clean run per check-memo-commit. Memo + `.gitignore` guard written by the script's `write-memo` mode only.
 - Mechanical audits stay in the script; behavioral §V classification, interface shape-diff, task STALE-verify stay LLM; reads delegable to Explore sub-agents.
 - No scores, no grades. Binary per item: holds or drifts.
