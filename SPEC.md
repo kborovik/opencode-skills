@@ -64,7 +64,7 @@ T3|x|confirm §V alias-merges flagged `?` (V2 monotonic-id, V12 published-toolin
 T4|x|author `scripts/install.sh` — global deploy per install-model: `git clone` to `~/.local/share/opencode-skills/` + symlink into `~/.config/opencode/{skills,commands}/` and `~/.opencode/scripts/check-mechanical.py`; idempotent, `curl | sh` bootstrap|I.script,V26
 T5|x|move `install.sh` from `scripts/` to repo root; refresh bootstrap URL + test-script path; preserve T4 closure history|I.install-sh
 T6|x|add `commands/sdd-explain.md` — slash command mirroring explain skill (description-only frontmatter distilled from `skills/explain/SKILL.md`, body delegates via `invoke the explain skill $ARGUMENTS`) per V9 response-shape contract|I.cmd,V9
-T7|.|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.install-sh,V26
+T7|x|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.install-sh,V26
 
 ## §B BUGS
 id|date|cause|fix

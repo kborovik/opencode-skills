@@ -3,9 +3,10 @@
 #
 # - clones <REPO> into ~/.local/share/opencode-skills/<repo-name>
 #   (skipped if the clone dir already holds a git repo)
-# - symlinks <clone>/skills, <clone>/commands, and
-#   <clone>/scripts/check-mechanical.py into the per-consumer target dirs
-#   (~/.config/opencode/, ~/.opencode/scripts/)
+# - per-file symlinks each entry under <clone>/skills/, <clone>/commands/,
+#   and <clone>/scripts/ into the per-consumer target dirs
+#   (~/.config/opencode/skills/<name>, ~/.config/opencode/commands/<name>,
+#   ~/.opencode/scripts/<name>)
 # - idempotent: re-running is safe; existing non-matching symlinks or real
 #   entries at the target are reported and left in place (operator must
 #   clean up before the symlink will take effect)
@@ -57,6 +58,20 @@ link() {
   ln -s "${src}" "${dst}"
 }
 
-link "${CLONE_DIR}/skills"                      "${HOME}/.config/opencode/skills"
-link "${CLONE_DIR}/commands"                    "${HOME}/.config/opencode/commands"
-link "${CLONE_DIR}/scripts/check-mechanical.py" "${HOME}/.opencode/scripts/check-mechanical.py"
+# Per-file symlinks: each entry under <clone>/skills/, <clone>/commands/,
+# <clone>/scripts/ becomes its own symlink into the matching per-consumer
+# target dir. Updates via `git pull` in the clone flow through symlinks.
+# V26: entry names sourced from glob over $CLONE_DIR, never hardcoded.
+deploy() {
+  local src_dir="$1" dst_dir="$2"
+  local entry name
+  for entry in "${src_dir}"/*; do
+    [ -e "${entry}" ] || continue
+    name="$(basename "${entry}")"
+    link "${entry}" "${dst_dir}/${name}"
+  done
+}
+
+deploy "${CLONE_DIR}/skills"   "${HOME}/.config/opencode/skills"
+deploy "${CLONE_DIR}/commands" "${HOME}/.config/opencode/commands"
+deploy "${CLONE_DIR}/scripts"  "${HOME}/.opencode/scripts"
