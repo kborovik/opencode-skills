@@ -112,7 +112,7 @@ import sys
 # --- verdict vocab (drift-verdict-vocab invariant) ---------------------------
 # Per-row-type admissibility: §V (invariant), §I (interface), §T (task) rows each
 # carry only the verdicts valid for their type, so the LLM can't silently remap
-# an out-of-type verdict (closes §B.8). MATCH is the §I-clean verdict, admissible
+# an out-of-type verdict (closes §B.<n>). MATCH is the §I-clean verdict, admissible
 # on §I rows only. Pseudo-id rows (mechanical findings: format/cite/history/… )
 # are unrestricted — script-emitted, already trusted.
 
@@ -1000,7 +1000,7 @@ def audit_mechanize_block(skill_md):
 def classify_dispatch_targets(skill_texts, subskills):
     """Dispatch-target audit core over {path: text} — pure, unit-testable
     without the filesystem (response-shape + sub-skill-flags invariants, closes
-    §B.14). No skill body may tell the operator to directly invoke an
+    §B.<n>). No skill body may tell the operator to directly invoke an
     internal sub-skill: "invoke the <name> skill" where <name> is an internal
     sub-skill is never a valid dispatch target (the bug→spec route is
     "invoke the spec skill" with the cause, never a direct sub-skill).
@@ -1052,7 +1052,7 @@ def classify_dispatch_targets_from_texts(skill_texts):
 
 def audit_dispatch_targets(skill_md):
     """File-reading wrapper around classify_dispatch_targets_from_texts
-    (response-shape + sub-skill-flags invariants, closes §B.14). Realized once
+    (response-shape + sub-skill-flags invariants, closes §B.<n>). Realized once
     here so the drift-detector retires its hand-run skill-body invocation grep — the
     sub-skill set is derived frontmatter-only (description prefix), where a hand
     grep would over-match a prose mention of the description."""
@@ -1232,7 +1232,7 @@ def recommend_batch_count(v_count, published_census):
     override: PUBLISHED file census < ceil(|V| / 2) → 1 agent regardless — a
     narrow file set means cross-cutting greps amortize (one in-thread `rg` sweep
     beats per-agent spawn cost). Census is the deterministic PUBLISHED markdown
-    file count, not an LLM-eyeballed repo-file proxy (closes §B.7)."""
+    file count, not an LLM-eyeballed repo-file proxy (closes §B.<n>)."""
     if v_count <= 0:
         return 1
     base = (v_count + BATCH_ROW_DIVISOR - 1) // BATCH_ROW_DIVISOR
@@ -1247,7 +1247,7 @@ def audit_batch_advisory(v_rows, published_md):
     `batch|ADVISORY|recommended: <n> agents` from the live §V row count +
     PUBLISHED file census. The drift-detector consumes this row for its
     Batch-protocol agent count instead of hand-computing the heuristic
-    (closes §B.7)."""
+    (closes §B.<n>)."""
     n = recommend_batch_count(len(v_rows), len(published_md))
     return [("batch", ADVISORY, f"recommended: {n} agents")]
 
@@ -1764,7 +1764,7 @@ def validate_vocab(rows):
     """Per-row-type verdict admissibility (drift-verdict-vocab invariant): each
     classified row carries only a verdict valid for its type — MATCH is §I-only,
     V-vocab §V-only, STALE §T-only — so the LLM can't silently remap an
-    out-of-type verdict (closes §B.8). Pseudo-id rows are unrestricted; a blank
+    out-of-type verdict (closes §B.<n>). Pseudo-id rows are unrestricted; a blank
     verdict (unfilled skeleton row) is skipped. Returns list of complaints."""
     bad = []
     for rid, v, _ in rows:
@@ -2338,7 +2338,7 @@ def selftest():
     )
 
     # batch agent count (batch invariant): ceil(|V|/15) clamp [1,4]; PUBLISHED
-    # census < ceil(|V|/2) → 1 regardless; census deterministic (closes §B.7)
+    # census < ceil(|V|/2) → 1 regardless; census deterministic (closes §B.<n>)
     check(recommend_batch_count(0, 5) == 1, "batch: empty §V → 1 agent")
     check(recommend_batch_count(14, 50) == 1, "batch: <15 rows → base 1 agent")
     check(recommend_batch_count(16, 50) == 2, "batch: ceil(16/15) → 2 agents")
@@ -2471,7 +2471,7 @@ def selftest():
     )
 
     # dispatch-target audit (response-shape + sub-skill-flags invariants, closes
-    # §B.14): no skill body tells the operator to directly invoke an internal
+    # §B.<n>): no skill body tells the operator to directly invoke an internal
     # sub-skill; internal skills identified by description prefix. Backtick-wrapped
     # form exempt (verbatim-preservation).
     d_subskills = {"backprop", "monitor"}
