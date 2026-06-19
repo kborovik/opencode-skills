@@ -946,18 +946,22 @@ def classify_mechanize_blocks(skill_texts, command_names=None):
 
 
 def discover_command_names(repo_root):
-    """Slash-command names: `commands/sdd-*.md` → `{basename minus sdd-}`.
-    Feeds the MECHANIZE audit's `user-invocable + has command` filter (V14 —
-    MECHANIZE block inapplicable when no command dispatch follows; closes
-    §B.2 false-positive on `commit`, which has no `sdd-commit` command per V9
-    no-dispatch exception)."""
-    cmds_dir = os.path.join(repo_root, "commands")
+    """Slash-command names: `commands/sdd-*.md` and `.opencode/commands/sdd-*.md`
+    → `{basename minus sdd-}` (published-scope invariant V12 — project-local
+    commands audited as PUBLISHED-equivalent, symmetric w/ the skill-side union
+    in `skill_pack_source_dirs`). Feeds the MECHANIZE audit's `user-invocable +
+    has command` filter (V14 — MECHANIZE block inapplicable when no command
+    dispatch follows; closes §B.2 false-positive on `commit`, which has no
+    `sdd-commit` command per V9 no-dispatch exception). Union of both dirs,
+    `commands/` first so a duplicate in both resolves to one name."""
     out = set()
-    if not os.path.isdir(cmds_dir):
-        return out
-    for fn in sorted(os.listdir(cmds_dir)):
-        if fn.startswith("sdd-") and fn.endswith(".md"):
-            out.add(fn[len("sdd-") : -len(".md")])
+    for sub in ("commands", os.path.join(".opencode", "commands")):
+        cmds_dir = os.path.join(repo_root, sub)
+        if not os.path.isdir(cmds_dir):
+            continue
+        for fn in sorted(os.listdir(cmds_dir)):
+            if fn.startswith("sdd-") and fn.endswith(".md"):
+                out.add(fn[len("sdd-") : -len(".md")])
     return out
 
 
@@ -2676,6 +2680,40 @@ def selftest():
     )
     # skill names from skills/*/SKILL.md frontmatter
     check(plugin_names("/no/such/repo") == [], "plugin_names: absent dir → empty")
+    # V12 — discover_command_names walks `commands/` AND `.opencode/commands/`
+    # so project-local commands enroll their skills in the MECHANIZE audit
+    # set (published-scope union, symmetric w/ skill_pack_source_dirs).
+    import tempfile
+    import shutil as _shutil2
+    tmp_c = tempfile.mkdtemp(prefix="check-mech-cmd-")
+    try:
+        # both dirs present → union of sdd-* basenames
+        os.makedirs(os.path.join(tmp_c, "commands"))
+        os.makedirs(os.path.join(tmp_c, ".opencode", "commands"))
+        open(os.path.join(tmp_c, "commands", "sdd-spec.md"), "w").close()
+        open(os.path.join(tmp_c, "commands", "sdd-build.md"), "w").close()
+        open(os.path.join(tmp_c, ".opencode", "commands", "sdd-release.md"), "w").close()
+        open(os.path.join(tmp_c, ".opencode", "commands", "sdd-build.md"), "w").close()  # dup
+        names_c = discover_command_names(tmp_c)
+        check(
+            names_c == {"spec", "build", "release"},
+            "discover_command_names: union over commands/ + .opencode/commands/ (V12)",
+        )
+        # only .opencode/commands/ present → still discovered
+        _shutil2.rmtree(os.path.join(tmp_c, "commands"))
+        check(
+            discover_command_names(tmp_c) == {"release", "build"},
+            "discover_command_names: .opencode/commands/ only still discovered (V12)",
+        )
+        # neither present → empty
+        _shutil2.rmtree(os.path.join(tmp_c, ".opencode"))
+        check(
+            discover_command_names(tmp_c) == set(),
+            "discover_command_names: neither dir → empty (V12)",
+        )
+    finally:
+        _shutil2.rmtree(tmp_c, ignore_errors=True)
+    del _shutil2
 
     # allowed-tools grant-use audit: in opencode, any `allowed-tools` line emits SKIP
     # (tool access is managed globally in opencode.jsonc, not per-skill frontmatter).
@@ -2807,7 +2845,7 @@ def selftest():
 
 def _selftest_count():
     # informational; kept in sync loosely with the check() calls above
-    return 155
+    return 158
 
 
 # --- entry -------------------------------------------------------------------
