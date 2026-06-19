@@ -1420,13 +1420,18 @@ def read_text(path):
 
 
 def skill_pack_source_dirs(repo_root):
-    """Resolve `skills/` to absolute dir. Returns list of one dir
-    (the skills directory) or empty if absent. Repo-agnostic; shared by
-    published-md + skill-md discovery so PUBLISHED-scope root is resolved once."""
-    d = os.path.join(repo_root, "skills")
-    if os.path.isdir(d):
-        return [d]
-    return []
+    """PUBLISHED skill pack source dirs — `skills/` and `.opencode/skills/`
+    (project-local skills audited as PUBLISHED-equivalent per the published-scope
+    invariant V12). Returns each existing dir, `skills/` first so the
+    MECHANIZE/dispatch/pinned-cite/batch audits census a union over both.
+    Repo-agnostic; shared by published-md + skill-md discovery so PUBLISHED-scope
+    roots are resolved once."""
+    out = []
+    for sub in ("skills", os.path.join(".opencode", "skills")):
+        d = os.path.join(repo_root, sub)
+        if os.path.isdir(d):
+            out.append(d)
+    return out
 
 
 def plugin_source_dirs(repo_root, plugins):
@@ -1444,30 +1449,33 @@ def plugin_dirs(repo_root):
 
 
 def plugin_names(repo_root):
-    """PUBLISHED skill names — discovered from `skills/*/SKILL.md`
-    frontmatter `name` field. Returns the name from each skill's frontmatter,
-    falling back to directory name when `name` is absent. Used for dispatch-target
-    pattern matching."""
+    """PUBLISHED skill names — discovered from `skills/*/SKILL.md` and
+    `.opencode/skills/*/SKILL.md` frontmatter `name` field (published-scope
+    invariant V12 — project-local skills audited as PUBLISHED-equivalent).
+    Returns the name from each skill's frontmatter, falling back to directory
+    name when `name` is absent. Used for dispatch-target pattern matching."""
     names = []
-    skills_dir = os.path.join(repo_root, "skills")
-    if not os.path.isdir(skills_dir):
-        return []
-    for name in sorted(os.listdir(skills_dir)):
-        skill_path = os.path.join(skills_dir, name, "SKILL.md")
-        if os.path.isfile(skill_path):
-            try:
-                text = read_text(skill_path)
-                fm = parse_frontmatter(text)
-                for line in fm.splitlines():
-                    if line.lower().startswith("name:"):
-                        val = line[len("name:") :].strip().strip('"').strip("'")
-                        if val:
-                            names.append(val)
-                            break
-                else:
+    for skills_dir in skill_pack_source_dirs(repo_root):
+        if not os.path.isdir(skills_dir):
+            continue
+        for name in sorted(os.listdir(skills_dir)):
+            skill_path = os.path.join(skills_dir, name, "SKILL.md")
+            if os.path.isfile(skill_path):
+                try:
+                    text = read_text(skill_path)
+                    fm = parse_frontmatter(text)
+                    matched = False
+                    for line in fm.splitlines():
+                        if line.lower().startswith("name:"):
+                            val = line[len("name:") :].strip().strip('"').strip("'")
+                            if val:
+                                names.append(val)
+                                matched = True
+                                break
+                    if not matched:
+                        names.append(name)
+                except OSError:
                     names.append(name)
-            except OSError:
-                names.append(name)
     return names
 
 
@@ -1484,26 +1492,27 @@ def discover_published_md(repo_root):
 
 
 def discover_skill_md(repo_root):
-    """PUBLISHED skill bodies — `skills/*/SKILL.md`.
-    Opencode discovers skills by walking this directory; frontmatter
-    `description` starting with "Internal — not for direct invocation" marks
-    internal sub-skills. Repo-agnostic; feeds the mechanize-block audit's
-    user-invocable set."""
-    skills_dir = os.path.join(repo_root, "skills")
-    if not os.path.isdir(skills_dir):
-        return []
+    """PUBLISHED skill bodies — `skills/*/SKILL.md` and `.opencode/skills/*/SKILL.md`
+    (published-scope invariant V12 — project-local skills audited as
+    PUBLISHED-equivalent). Opencode discovers skills by walking these
+    directories; frontmatter `description` starting with "Internal — not for
+    direct invocation" marks internal sub-skills. Repo-agnostic; feeds the
+    mechanize-block audit's user-invocable set."""
     out = []
-    for name in sorted(os.listdir(skills_dir)):
-        p = os.path.join(skills_dir, name, "SKILL.md")
-        if os.path.isfile(p):
-            out.append(p)
+    for skills_dir in skill_pack_source_dirs(repo_root):
+        if not os.path.isdir(skills_dir):
+            continue
+        for name in sorted(os.listdir(skills_dir)):
+            p = os.path.join(skills_dir, name, "SKILL.md")
+            if os.path.isfile(p):
+                out.append(p)
     return sorted(out)
 
 
 def discover_grant_skills(repo_root):
     """SKILL.md set the grant-use audit spans: same as discover_skill_md
-    (`skills/*/SKILL.md`). In opencode, all PUBLISHED skills live in one
-    directory; there is no separate REPO-LOCAL skills path. Repo-agnostic."""
+    (`skills/*/SKILL.md` + `.opencode/skills/*/SKILL.md`, published-scope
+    invariant V12). Repo-agnostic."""
     return discover_skill_md(repo_root)
 
 
@@ -2059,6 +2068,58 @@ def selftest():
         plugin_source_dirs("/r", [{}, {"source": ""}]) == [],
         "plugin_source_dirs: deprecated — returns empty",
     )
+    # V12 — PUBLISHED discovery walks `skills/` AND `.opencode/skills/` so
+    # project-local skills are audited as PUBLISHED-equivalent. Use a temp
+    # tree to exercise both present, only one present, and neither.
+    import tempfile
+    import shutil as _shutil
+    tmp = tempfile.mkdtemp(prefix="check-mech-test-")
+    try:
+        # both dirs present → union in source order (skills/ first)
+        os.makedirs(os.path.join(tmp, "skills", "a"))
+        os.makedirs(os.path.join(tmp, ".opencode", "skills", "b"))
+        _write_skill = lambda d, name, fm_name=None: open(
+            os.path.join(tmp, d, name, "SKILL.md"), "w", encoding="utf-8"
+        ).write(
+            "---\n"
+            + (f"name: {fm_name}\n" if fm_name else "")
+            + f"description: skill {name}\n---\n\n# {name}\n"
+        )
+        _write_skill("skills", "a", fm_name="alpha")
+        _write_skill(".opencode/skills", "b", fm_name="beta")
+        srcs = skill_pack_source_dirs(tmp)
+        check(
+            [os.path.basename(s) for s in srcs] == ["skills", "skills"]
+            and os.path.basename(os.path.dirname(srcs[1])) == ".opencode",
+            "skill_pack_source_dirs: returns skills/ + .opencode/skills/ (V12 union)",
+        )
+        md = discover_skill_md(tmp)
+        check(
+            any(p.endswith("skills/a/SKILL.md") for p in md)
+            and any(p.endswith(".opencode/skills/b/SKILL.md") for p in md),
+            "discover_skill_md: walks both skills/ and .opencode/skills/ (V12)",
+        )
+        names = plugin_names(tmp)
+        check(
+            "alpha" in names and "beta" in names,
+            "plugin_names: reads frontmatter name from both dirs (V12)",
+        )
+        # only .opencode/skills/ present → still discovered
+        _shutil.rmtree(os.path.join(tmp, "skills"))
+        check(
+            any(p.endswith(".opencode/skills/b/SKILL.md") for p in discover_skill_md(tmp)),
+            "discover_skill_md: .opencode/skills/ only still discovered (V12)",
+        )
+        # neither present → empty
+        _shutil.rmtree(os.path.join(tmp, ".opencode"))
+        check(
+            skill_pack_source_dirs(tmp) == []
+            and discover_skill_md(tmp) == []
+            and plugin_names(tmp) == [],
+            "skill_pack_source_dirs: neither dir → empty (V12)",
+        )
+    finally:
+        _shutil.rmtree(tmp, ignore_errors=True)
     # body-row aggregation: > threshold → single per-section summary row
     many_v = [
         {"id": f"V{200 + i}", "body": "foo retired 2026-01-02 bar", "line": i + 1}
@@ -2746,7 +2807,7 @@ def selftest():
 
 def _selftest_count():
     # informational; kept in sync loosely with the check() calls above
-    return 149
+    return 155
 
 
 # --- entry -------------------------------------------------------------------
