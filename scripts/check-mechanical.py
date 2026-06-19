@@ -9,84 +9,15 @@ grep, memo bookkeeping (sha / rev-parse), and token estimate. Emits the
 standardized `id|verdict|evidence` pipe-table the skill merges into its REPORT.
 
 Modes:
-  audit       — read SPEC.md (+ sibling archive if present), run every mechanical
-                audit, print the pipe-table. Optionally probe a REPO-LOCAL hook.
-                Emits `mechanize|DRIFT|…` / `mechanize|MISSING|…` — the
-                mechanize-scan invariant's verbatim-block check: every
-User-invocable `skills/*/SKILL.md` carries the byte-identical canonical MECHANIZE block (DRIFT divergent, MISSING absent), realized once
-here so the drift-detector retires its hand-run `awk|md5|uniq`.
-Emits `dispatch|VIOLATE|…` — the response-shape invariant's
-dispatch-target rule: no skill body tells the operator to directly
-invoke an internal sub-skill (those with description prefix "Internal —
-not for direct invocation"). Backtick-wrapped forms exempt — realized once
-here so the drift-detector retires its hand-run skill-body grep.
-Emits `grant|SKIP|…` — opencode skills do not use per-skill
-`allowed-tools` frontmatter; tool access is managed globally in
-`opencode.jsonc`. This check is a no-op in opencode context (preserved
-for cross-format compatibility).
-                Emits `batch|ADVISORY|recommended: <n> agents` — the
-                §V-classification sub-agent count from the §V row count +
-                PUBLISHED file census (batch invariant), consumed by the
-                drift-detector's batch step in place of a hand-computed heuristic.
-                Also emits the machine-side scope feed for the memo-driven default
-                sweep: `tasks|ADVISORY|flipped-since-clean: …` (§T flipped `.`→`x`
-                since the memo's clean sha) and `diff|ADVISORY|touched: …` (paths
-                changed since that sha). These plus the reshaped
-                `memo|ADVISORY|… : <ids>` row carry stable comma-joined fields
-                (no surrounding prose) so the drift-detector chains them straight
-                into `emit-v-slices --dirty` without hand-rolling `git diff`.
-  write-memo  — read the behavioral verdict table (§V/§I/§T classifications) on
-                stdin; with --from-audit, re-run the mechanical audit internally
-                and merge it (stdin = behavioral rows only, hand-merge banned).
-                Validate the verdict vocab per row type, compute clean-set
-                membership itself, and write the run memo (schema v3, per-row §V
-                hashes, oversized-cell ack) — only when the run is clean. The
-                model never decides "clean". Exit 0 = clean, 1 = dirty (memo
-                untouched, CI-gateable), 2 = invalid vocab. The `.gitignore`
-                guard is no longer written — check-memo-commit mandates the
-                memo be auto-committed on clean runs, so the file is tracked,
-                not ignored.
-  emit-v-slices — read SPEC.md, print every §V row body with its source line
-                range (`## V<n> SPEC.md:<start>-<end>` header + verbatim row
-                text). Optional `--dirty V<n>,...` restricts to named rows
-                (default is all). Sources the §V-classification slice for the
-                drift-detector's single-agent and sub-agent batch paths without a
-                whole-file Read (large SPEC exceeds the Read token cap).
-  emit-superseded — read SPEC.md, print the condenser's prong-2 SUPERSEDED
-                candidate set: every closed §T whose §V cite resolves only into
-                the archived §V.retired block (absent from live §V). Live-only
-                resolution, distinct from the cite-DAG audit's live+archive
-                scope. Prints a `tid|superseded_v|original_cites` table the
-                condenser consumes in place of by-hand per-cite resolution.
-  emit-fold-seeds — read SPEC.md, print the condenser's prong-1 fold-candidate
-                seed set: clusters of live §V rows that share a citer (a §T
-                whose cites or a §B whose fix names ≥ 2 live §V rows co-cites
-                them). Connected components over the co-citation graph. Prints a
-                `cluster_members|co_citers` table — an advisory seed only; the
-                operator confirms each fold at the condense CONFIRM gate (never
-                auto-applied) per the fold-first-authoring invariant.
-  emit-v-weights — read SPEC.md, print the condenser's prong-6 per-§V-row
-                byte/token weight ranking plus the heavy-row set (top rows whose
-                cumulative weight first reaches ≥ 50% of the §V section; stable
-                tie-break descending weight then ascending id so run-stable).
-                Prints a `v_row|bytes|tokens|cum_pct|heavy` table sorted heaviest
-                first — the condenser extracts the heavy rows' audit recipes
-                without a by-inspection guess.
-  emit-row-ids — read SPEC.md, print the canonical live id-set skeleton: every
-                live §V + §I + §T id as a verdict-table row with blank verdict
-                and evidence cells (`id||`). The drift-detector fills verdicts
-                against this skeleton instead of hand-enumerating the live row
-                set, so a live row can't be silently dropped from the verdict
-                table (omitted-row undercoverage class). §I ids derive from
-                kind-prefixed interface rows (`- api: POST /x → …` → `I.api`).
-  emit-overview — read SPEC.md, print the LOAD-step spec overview: §G/§C/§I/§T/§B
-                headers + bodies verbatim plus the §V id list only (no §V row
-                bodies). The drift-detector loads this in place of a whole-file
-                Read per the single-load invariant; §V bodies arrive via
-                emit-v-slices, so loading them here too would double-load SPEC.md
-                and re-hit the Read token cap on a large spec. The id list lets
-                the consumer size the classification batch from the row count.
-  --self-test — run inline fixtures; exit 0 iff every assertion holds.
+  audit           — read SPEC.md (+ optional archive), run all mechanical audits, print `id|verdict|evidence` pipe-table. REPO-LOCAL hook probe optional.
+  write-memo      — read behavioral verdicts on stdin; with `--from-audit`, re-run + merge. Validate per-row-type vocab, write run memo (schema v3) on clean. Exit 0/1/2.
+  emit-v-slices   — read SPEC.md, print every §V row body with line range (`## V<n> SPEC.md:<start>-<end>` + text). Optional `--dirty V<n>,...` filter.
+  emit-superseded — read SPEC.md, print prong-2 SUPERSEDED candidate set (closed §T whose §V cite resolves only into §V.retired). Prints `tid|superseded_v|original_cites`.
+  emit-fold-seeds — read SPEC.md, print prong-1 fold-candidate seed set (live §V rows sharing a citer). Prints `cluster_members|co_citers`.
+  emit-v-weights  — read SPEC.md, print prong-6 per-§V-row weight ranking + heavy-row set. Prints `v_row|bytes|tokens|cum_pct|heavy`.
+  emit-row-ids    — read SPEC.md, print canonical live id-set skeleton (one `id||` row per live §V + §I + §T). Drift-detector fills verdicts against this.
+  emit-overview   — read SPEC.md, print LOAD-step overview (all sections verbatim, §V as id-list only). §V bodies arrive via `emit-v-slices` to avoid double-load.
+  --self-test     — run inline fixtures; exit 0 iff every assertion holds.
 
 Parametric per the published-tooling invariant: reads SPEC-FORMAT conventions and
 scope sets as input (PUBLISHED scope discovered from `skills/*/SKILL.md`
