@@ -1,20 +1,23 @@
 # SPEC — opencode-skills
 
 ## §G GOAL
-SDD skill pack for opencode — author, build, check, condense, design, reorganize a root `SPEC.md`; 13 cross-referential skills + 6 slash commands + 1 mechanical audit script ship together so intra-pack references resolve.
+SDD skill pack for opencode — author, build, check, condense, design, reorganize a root `SPEC.md`; 13 cross-referential skills + 7 slash commands + 1 mechanical audit script + 1 project-local skill ship together so intra-pack references resolve.
 
 ## §C CONSTRAINTS
 - MIT license; opencode-native frontmatter (`name`, `description`, `license: MIT`, `compatibility: opencode`); skill dir name == frontmatter name.
 - No global opencode config shipped (consumer responsibility).
 - `check` skill references `~/.opencode/scripts/check-mechanical.py` via hardcoded path — `install.sh` deploys script there; required for `check` to function.
 - Skills cross-referential — all 13 ship together or references dangle.
+- Project-local skills under `.opencode/skills/` ship in-repo only (not deployed by `install.sh`); audited as PUBLISHED-equivalent per §V.12.
 - LLM-facing surfaces (SPEC.md, SPEC-FORMAT.md, skill bodies) telegraph register; human-facing (README, issues, operator prose) steno.
 - `check-mechanical.py` zero-dep (stdlib `hashlib`/`json` only); owns mechanical audits + memo + self-test.
 - install model — global install: `git clone` to `~/.local/share/opencode-skills/` + per-file symlink for each entry under `<clone>/skills/`, `<clone>/commands/`, `<clone>/scripts/` into per-consumer target dirs (`~/.config/opencode/skills/<name>`, `~/.config/opencode/commands/<name>`, `~/.opencode/scripts/<name>`); updates via `git pull` in clone target flow through symlinks; `install.sh` curl-bootstrappable from repo `main`.
 
 ## §I INTERFACES
-- skill: `skills/<name>/SKILL.md` → 13 skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
-- cmd: `commands/sdd-*.md` → 7 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize, sdd-explain)
+- skill: `skills/<name>/SKILL.md` → 13 PUBLISHED skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
+- local-skill: `.opencode/skills/<name>/SKILL.md` → 1 project-local skill (release); not deployed by `install.sh`; audited as PUBLISHED-equivalent per §V.12
+- cmd: `commands/sdd-*.md` → 7 PUBLISHED slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize, sdd-explain)
+- local-cmd: `.opencode/commands/sdd-<name>.md` → 1 project-local slash command (sdd-release); not deployed by `install.sh`
 - script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `write-memo`, `emit-v-slices`, `emit-superseded`, `emit-fold-seeds`, `emit-v-weights`, `emit-row-ids`, `emit-overview`, `emit-token-estimate`; flag `--self-test`; deployed `~/.opencode/scripts/`
 - script: `install.sh` → global deploy: `git clone` to `~/.local/share/opencode-skills/` (skip if exists) + per-file symlink for each `<clone>/skills/<name>` → `~/.config/opencode/skills/<name>`, `<clone>/commands/<name>` → `~/.config/opencode/commands/<name>`, `<clone>/scripts/<name>` → `~/.opencode/scripts/<name>`; idempotent re-run, `curl | sh` bootstrap supported
 - format: `skills/spec/SPEC-FORMAT.md` → structural format reference (row schemas, section catalog, citation forms, archive sibling); consumed by spec/check/condense/reorganize via direct Read
@@ -36,7 +39,7 @@ V8: skills-only — no hooks / runtime interception; skills are LLM self-report 
 V9: response-shape — user-typeable SKILL.md carries `## Next` block (1–5 atomic positional-dispatch items); recipe ends at commit, dispatch is operator turn; exception `commit` skill w/o follow-up dispatch surface — `## Next` block optional (closes §B.2).
 V10: sub-skill-flags — internal sub-skills (telegraph, backprop, socratic, steno, monitor) not directly invocable; auto-fire or programmatic only; description opens "Internal — not for direct invocation" (frontmatter description detection handles YAML 1.2 block-scalar continuation lines; closes §B.15).
 V11: dispatch — recipe-step-no-dispatch: skills never self-dispatch other skills mid-run; skill hand-off expressed only via `## Next` positional items, operator dispatches next turn.
-V12: published-scope — PUBLISHED scope (skills/, commands/, scripts/, SPEC-FORMAT.md) bans pinned numeric §-cites (`§V.7`); use placeholder form (`§V.<n>`) or inline rule embedding.
+V12: published-scope — PUBLISHED scope (skills/, commands/, scripts/, SPEC-FORMAT.md, `.opencode/skills/`, `.opencode/commands/`) bans pinned numeric §-cites (`§V.7`); use placeholder form (`§V.<n>`) or inline rule embedding; audit discovery walks `skills/*/SKILL.md` AND `.opencode/skills/*/SKILL.md` so project-local skills audited as PUBLISHED-equivalent (MECHANIZE byte-identity, dispatch-target, pinned-cite ban).
 V13: mechanical-realization — deterministic audit rules realized once in check-mechanical.py; not re-paraphrased per run; script regex is single source of truth; LLM re-derivation forbidden.
 V14: mechanize-scan — every user-invocable SKILL.md carries byte-identical canonical MECHANIZE block; script audits byte-identity (DRIFT/MISSING) across the user-invocable set; exempt internal sub-skills w/o corresponding slash-command (`backprop`, `monitor`, `socratic`, `steno`, `telegraph`) and the `commit` skill per V9 no-dispatch exception — MECHANIZE block inapplicable when no command dispatch follows (closes §B.1).
 V15: scope-set — scope vocabulary {PUBLISHED, REPO-LOCAL, SPEC-ADJACENT, GITHUB-FACING}; invariants reduce audit touch-set; default full repo.
@@ -67,6 +70,9 @@ T6|x|add `commands/sdd-explain.md` — slash command mirroring explain skill (de
 T7|x|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.script,V26
 T8|x|fix `scripts/check-mechanical.py` `emit-row-ids` §I extraction — drops hyphenated kinds (`renumber-map`, `check-state`); V13 regex single source of truth|V13
 T9|x |fix `scripts/check-mechanical.py` `is_user_invocable` YAML 1.2 block-scalar parsing — strip indent from `description: |` continuation lines, prefix-match `Internal` on any continuation line; covers §B.1 + §B.2 false-positive MISSING|I.script,V10,B15
+T10|.|extend `scripts/check-mechanical.py` PUBLISHED discovery — `skill_pack_source_dirs`, `plugin_names`, `discover_skill_md` walk `.opencode/skills/*/SKILL.md` in addition to `skills/*/SKILL.md`; census union for MECHANIZE/dispatch/pinned-cite/batch audits|V12,V13
+T11|.|author `.opencode/skills/release/SKILL.md` — `gh release create` wrapper; tag = `git describe --tags` then bump (patch default, minor/major via AskUserQuestion per §V.23); notes = `git log <last-tag>..HEAD` conventional-commit subjects grouped by type; AskUserQuestion gate pre-create; body telegraph; MECHANIZE + `## Next` blocks per §V.9,§V.14|V9,V12,V14,V23,V26
+T12|.|add `.opencode/commands/sdd-release.md` — thin wrapper, frontmatter description distilled from release SKILL.md, body `invoke the release skill: $ARGUMENTS`|V9
 
 ## §B BUGS
 id|date|cause|fix
