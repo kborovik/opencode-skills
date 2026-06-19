@@ -4,7 +4,8 @@ description: |
   GitHub release wrapper. Bumps the last `git describe --tags` tag (patch
   default; minor/major via AskUserQuestion per decision-gate invariant), drafts
   notes from `git log <last-tag>..HEAD` conventional-commit subjects grouped by
-  type, gates on AskUserQuestion before `gh release create`. Invoke when user
+  type, verifies local HEAD is pushed to upstream before `gh release create`
+  (release-sync-precondition), gates on AskUserQuestion. Invoke when user
   asks to "cut a release", "publish a release", "tag a release", or "ship a
   version". Project-local — ships in-repo only, not deployed by `install.sh`.
 license: MIT
@@ -52,6 +53,34 @@ tag is irrecoverable). One question, header `Release create`:
   - "Cancel — do not create"
 
 Operator selects → proceed. Cancel → stop, no `gh` call, no tag mutation.
+
+## SYNC
+
+Release-sync-precondition (per §V.<n>) — fires after GATE approval, before
+CREATE. Published tag points at the commit `gh release create` resolves on the
+remote; if local HEAD is ahead of upstream, the tag lands on the stale remote
+HEAD while release notes (drafted from local `git log`) cover unpushed
+commits — release contents and notes diverge. Guard:
+
+1. Resolve upstream branch: `git rev-parse --abbrev-ref @{u}`. No upstream
+   configured (new branch, bare clone w/o tracking) → AskUserQuestion, header
+   `Push-target fallback`, confirm the `<remote>/<branch>` to push; operator
+   may cancel.
+2. Compare `git rev-parse HEAD` vs `git rev-parse @{u}`:
+   - equal → synced; proceed to CREATE.
+   - local ahead → `git push <remote> <branch>`; on push failure (rejected
+     non-fast-forward, auth) → abort w/ "push failed; resolve then re-invoke".
+   - local behind or diverged → abort w/ "local and upstream diverged;
+     rebase/merge, re-invoke after sync".
+3. Uncommitted working tree (`git status --porcelain` non-empty) → abort w/
+   "working tree dirty; commit or stash, re-invoke". `gh release create` tags
+   HEAD regardless of working-tree state so dirty tree does not corrupt the
+   tag, but a dirty tree usually means the operator has unfinished work that
+   should not ship under the release commit; the guard surfaces this pre-tag.
+
+Tag push not done here — `gh release create` is the publish act and pushes the
+tag itself; SYNC pushes the branch only so the tag points at a commit upstream
+already has.
 
 ## NOTES
 
@@ -122,5 +151,6 @@ Heading `## Next`; 1–5 atomic items (one sentence each, no `Reply` prefix); po
 - No changelog file writes. Release notes live in the GitHub release, not a
   `CHANGELOG.md` (freshness-contract invariant — history in commit log + GitHub
   release, not in-tree).
-- No auto-push of the tag. `gh release create` is the publish act.
+- No auto-push of the tag. `gh release create` is the publish act (and pushes
+  the tag). SYNC step pushes the branch only — see SYNC.
 - No bump-files (`package.json` version, etc.) — version lives in tags only.

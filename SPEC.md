@@ -76,7 +76,7 @@ T10|x|extend `scripts/check-mechanical.py` PUBLISHED discovery — `skill_pack_s
 T11|x|author `.opencode/skills/release/SKILL.md` — `gh release create` wrapper; tag = `git describe --tags` then bump (patch default, minor/major via AskUserQuestion per §V.23); notes = `git log <last-tag>..HEAD` conventional-commit subjects grouped by type|V9,V12,V14,V23,V26
 T12|x|add `.opencode/commands/sdd-release.md` — thin wrapper, frontmatter description distilled from release SKILL.md, body `invoke the release skill: $ARGUMENTS`|V9
 T13|x|add `scripts/check-mechanical.py` `emit-residue-candidates` mode — scan live §V/§T/§B bodies against V3 freshness-contract residue pattern set; emit candidate rows; single-sources regex shared w/ check audit + condense prong 4|V3,V13
-T14|. |update `.opencode/skills/release/SKILL.md` — add push-precondition step before CREATE: verify local HEAD synced with upstream (`git rev-parse HEAD` vs `git rev-parse @{u}`), push if ahead, abort on divergence/uncommitted; cite V34|V34
+T14|x|update `.opencode/skills/release/SKILL.md` — add push-precondition step before CREATE: verify local HEAD synced with upstream (`git rev-parse HEAD` vs `git rev-parse @{u}`), push if ahead, abort on divergence/uncommitted; cite V34|V34
 
 ## §B BUGS
 id|date|cause|fix
