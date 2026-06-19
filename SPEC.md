@@ -34,7 +34,7 @@ V6: fold-first-authoring — new §V row triggers decision-gate: fold into close
 V7: design-lifecycle — design file persists in working tree post-fold-in; spec fold-in mutates SPEC.md only; user removes or preserves design file manually.
 V8: skills-only — no hooks / runtime interception; skills are LLM self-report wrappers, not interceptors.
 V9: response-shape — user-typeable SKILL.md carries `## Next` block (1–5 atomic positional-dispatch items); recipe ends at commit, dispatch is operator turn; exception `commit` skill w/o follow-up dispatch surface — `## Next` block optional (closes §B.2).
-V10: sub-skill-flags — internal sub-skills (telegraph, backprop, socratic, steno, monitor) not directly invocable; auto-fire or programmatic only; description opens "Internal — not for direct invocation".
+V10: sub-skill-flags — internal sub-skills (telegraph, backprop, socratic, steno, monitor) not directly invocable; auto-fire or programmatic only; description opens "Internal — not for direct invocation" (frontmatter description detection handles YAML 1.2 block-scalar continuation lines; closes §B.15).
 V11: dispatch — recipe-step-no-dispatch: skills never self-dispatch other skills mid-run; skill hand-off expressed only via `## Next` positional items, operator dispatches next turn.
 V12: published-scope — PUBLISHED scope (skills/, commands/, scripts/, SPEC-FORMAT.md) bans pinned numeric §-cites (`§V.7`); use placeholder form (`§V.<n>`) or inline rule embedding.
 V13: mechanical-realization — deterministic audit rules realized once in check-mechanical.py; not re-paraphrased per run; script regex is single source of truth; LLM re-derivation forbidden.
@@ -66,11 +66,13 @@ T5|x|move `install.sh` from `scripts/` to repo root; refresh bootstrap URL + tes
 T6|x|add `commands/sdd-explain.md` — slash command mirroring explain skill (description-only frontmatter distilled from `skills/explain/SKILL.md`, body delegates via `invoke the explain skill $ARGUMENTS`) per V9 response-shape contract|I.cmd,V9
 T7|x|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.script,V26
 T8|x|fix `scripts/check-mechanical.py` `emit-row-ids` §I extraction — drops hyphenated kinds (`renumber-map`, `check-state`); V13 regex single source of truth|V13
+T9|. |fix `scripts/check-mechanical.py` `is_user_invocable` YAML 1.2 block-scalar parsing — strip indent from `description: |` continuation lines, prefix-match `Internal` on any continuation line; covers §B.1 + §B.2 false-positive MISSING|I.script,V10,B15
 
 ## §B BUGS
 id|date|cause|fix
-B1|2026-06-17|mechanize-scan false-positive RECURRING — YAML block-scalar description continuation lines still not parsed after fix attempt; 5 internal sub-skills (backprop, socratic, steno, telegraph, monitor) flagged user-invocable MISSING every check run despite V10-compliant "Internal — not for direct invocation" description prefix|V13,V14
-B2|2026-06-17|original capture reversed — commit SKILL.md authored legitimately w/o MECHANIZE + `## Next` blocks; commit is one-shot (stage→diff→commit→result line), no follow-up dispatch surface, no script-candidate scan step; path-scoping enforced via staged-index discipline (step 3) not commit-cmd flag pattern|V24
+B1|2026-06-17|mechanize-scan false-positive RECURRING — 5 internal sub-skills (backprop, socratic, steno, telegraph, monitor) flagged user-invocable MISSING every check run despite V10-compliant description prefix; root-cause class in §B.15|V14
+B2|2026-06-17|original capture reversed — commit SKILL.md authored legitimately w/o MECHANIZE + `## Next` blocks (V9 no-dispatch exception); same root-cause class as §B.1 captured in §B.15 (commit mis-classified user-invocable by `is_user_invocable`); path-scoping enforced via staged-index discipline (step 3) not commit-cmd flag pattern|V9,V24
 B7|2026-06-17|batch agent count eyeballed from repo-file census — LLM hand-computed heuristic, non-deterministic across runs|V19
 B8|2026-06-17|LLM silently remaps out-of-type verdict (MATCH on §V, V-vocab on §I) — no per-row-type admissibility gate|V16
 B14|2026-06-17|skill body instructs operator to directly invoke internal sub-skill — sub-skill set hand-grepped from bodies, over-matches prose mentions|V9,V10
+B15|2026-06-18|audit-script `is_user_invocable` mis-parses YAML 1.2 block-scalar descriptions — returns user-invocable when `description: |` opens multi-line value, never inspects continuation lines for V10 `Internal` prefix; root cause of §B.1 (5 internal sub-skills) + §B.2 (commit) recurring MISSING|V10
