@@ -61,6 +61,7 @@ V30: backprop-protocol — bug → spec skill BACKPROP records §B (+ §V if rec
 V31: monitor-protocol — skill-deviation auto-fire: REDACT (mandatory pre-publish) → ROUTE (dev repo → backprop hand-off, consumer repo → GitHub issue) → GATE (AskUserQuestion) → WRITE; no auto-file path; pre-write `--repo` assert.
 V32: check-memo-commit — on clean audit (V17 memo-gate: no VIOLATE/UNVERIFIABLE/UNRESOLVED/TYPE-MISMATCH/DRIFT/MISSING/STALE/EXTRA), check skill auto-commits `.opencode/check-state.json` (path-scoped per V24), no operator prompt; exemption to V20 read-only-diagnostic for this file only.
 V33: clarity-standard — human-facing prose (steno-register surfaces per github-facing-register invariant): main-point-first, one-idea-per-sentence, plain-words (no idiom / word-metaphor / colloquialism / culture-shorthand / jargon-idiom — write literal meaning), define-or-avoid jargon (established `drift`/`bottleneck`/`leak` fine), expand-acronym-on-first-use (common web/protocol acronyms `API`/`URL`/`JSON`/`HTTP`/`JWT` exempt), spell-out-symbols per steno SYMBOLS set, citation at sentence tail (§V.<n>, #123 not sentence-opening), operator-choice response states choice in one sentence + options one line each + one-sentence recommend (no trailing prose-question gate); full rules live in steno skill (SKIM TEST, SENTENCE SHAPE, SYMBOLS, BOUNDARIES carry most; net-new sub-rules: acronym-expansion, cite-at-tail, decision-format); author-guidance only, not check-audited (no mechanical audit); orthogonal to register-selection row.
+V34: release-sync-precondition — before `gh release create`, release skill verifies local HEAD pushed to upstream (`git rev-parse HEAD` == `git rev-parse @{u}`); ahead → `git push origin <branch>` first; diverged or uncommitted working tree → abort; ensures release tag points at the commit operator intends, release notes match release contents (closes §B.16).
 
 ## §T TASKS
 id|status|task|cites
@@ -75,6 +76,7 @@ T10|x|extend `scripts/check-mechanical.py` PUBLISHED discovery — `skill_pack_s
 T11|x|author `.opencode/skills/release/SKILL.md` — `gh release create` wrapper; tag = `git describe --tags` then bump (patch default, minor/major via AskUserQuestion per §V.23); notes = `git log <last-tag>..HEAD` conventional-commit subjects grouped by type|V9,V12,V14,V23,V26
 T12|x|add `.opencode/commands/sdd-release.md` — thin wrapper, frontmatter description distilled from release SKILL.md, body `invoke the release skill: $ARGUMENTS`|V9
 T13|x|add `scripts/check-mechanical.py` `emit-residue-candidates` mode — scan live §V/§T/§B bodies against V3 freshness-contract residue pattern set; emit candidate rows; single-sources regex shared w/ check audit + condense prong 4|V3,V13
+T14|. |update `.opencode/skills/release/SKILL.md` — add push-precondition step before CREATE: verify local HEAD synced with upstream (`git rev-parse HEAD` vs `git rev-parse @{u}`), push if ahead, abort on divergence/uncommitted; cite V34|V34
 
 ## §B BUGS
 id|date|cause|fix
@@ -84,3 +86,4 @@ B7|2026-06-17|batch agent count eyeballed from repo-file census — LLM hand-com
 B8|2026-06-17|LLM silently remaps out-of-type verdict (MATCH on §V, V-vocab on §I) — no per-row-type admissibility gate|V16
 B14|2026-06-17|skill body instructs operator to directly invoke internal sub-skill — sub-skill set hand-grepped from bodies, over-matches prose mentions|V9,V10
 B15|2026-06-18|audit-script `is_user_invocable` mis-parses YAML 1.2 block-scalar descriptions — returns user-invocable when `description: |` opens multi-line value, never inspects continuation lines for V10 `Internal` prefix|V10
+B16|2026-06-19|release skill `gh release create` tags remote HEAD w/o verifying local branch pushed — local-ahead case tags stale commit, release notes include unpushed commits not in release|V34
