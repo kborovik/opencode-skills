@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "last_clean_sha": "b2b6d85ac12aa6095428efc5dd1579a492695002",
+  "last_clean_sha": "ec44af2607c88e2a7e6b73d68cfbbf1ebd3ad028",
   "v_row_shas": {
     "V1": "93d870fce94b7cdfa03119b8f154459626d6a78fd94d52f9e0edbe76e6e4679a",
     "V2": "7af8e695b530ce00160ec26c25f4fa01e01c073d33350768b5e9330d70deb949",
@@ -36,7 +36,7 @@
     "V32": "0eeda42610ed58e4429a4a7e0789dedd9e14802b13b718d6b81d0f005d2f7a63",
     "V33": "41a0d8d98ce5e7313970a39dce34ca0b708464ec55bc388d0b1f4c7639473780"
   },
-  "last_run_at": "2026-06-19T15:14:08Z",
+  "last_run_at": "2026-06-19T15:40:01Z",
   "last_v_classifications": {
     "V1": "HOLD-SINCE-CLEAN",
     "V2": "HOLD-SINCE-CLEAN",
@@ -70,7 +70,7 @@
     "V30": "HOLD-SINCE-CLEAN",
     "V31": "HOLD-SINCE-CLEAN",
     "V32": "HOLD-SINCE-CLEAN",
-    "V33": "HOLD"
+    "V33": "HOLD-SINCE-CLEAN"
   },
   "oversized_cell_ack": "9298ea32491343aeebf2d9eee76def65babb24d29df1a9d6b7923ffb4a948108"
 }
