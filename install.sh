@@ -34,6 +34,10 @@ fi
 mkdir -p "$(dirname "${CLONE_DIR}")"
 
 if [ -d "${CLONE_DIR}/.git" ]; then
+  # Clone dir is a deploy-only mirror; discard any stray local edits so
+  # `pull` cannot be blocked by uncommitted changes made there by mistake.
+  git -C "${CLONE_DIR}" reset --hard >/dev/null
+  git -C "${CLONE_DIR}" clean -fd >/dev/null
   git -C "${CLONE_DIR}" pull --ff-only
 else
   git clone --depth=1 --branch "${REF}" "${REPO_URL}" "${CLONE_DIR}"
