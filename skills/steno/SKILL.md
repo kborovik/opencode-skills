@@ -84,7 +84,7 @@ Spell out full term on first use, acronym in parentheses: spec-driven developmen
 
 - **Bullets > paragraph** when listing > 2 items.
 - **Definition list** for term/explanation pairs: `` - `--dry-run` — print actions, do not execute. ``
-- **Table** for comparing options on same axes.
+- **List > table** — avoid markdown tables in human-facing docs; use bullets or definition lists whenever possible. Reserve tables for comparing > 2 options across > 2 axes where a list cannot carry the structure (per clarity-standard invariant).
 - **Headers + fragments** > full sentences in issue/PR bodies (see release-commit example below).
 
 ## EXAMPLES
