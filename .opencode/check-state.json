@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "last_clean_sha": "afab2ea6f0adf69f6f7b7c097de322821973f540",
+  "last_clean_sha": "b2b6d85ac12aa6095428efc5dd1579a492695002",
   "v_row_shas": {
     "V1": "93d870fce94b7cdfa03119b8f154459626d6a78fd94d52f9e0edbe76e6e4679a",
     "V2": "7af8e695b530ce00160ec26c25f4fa01e01c073d33350768b5e9330d70deb949",
@@ -33,9 +33,10 @@
     "V29": "c5fa24378c83a785bfc624c59032cb92eadaf10a578608ad47bace78673cb419",
     "V30": "f05ea97a673d9ff74cf689d4d125052942567b9caace750c2162140803a8d0bd",
     "V31": "0b35c110dcdc687f928449ee7bdbb0882be2aecade5bd6d96397a2f15c1c6b1c",
-    "V32": "0eeda42610ed58e4429a4a7e0789dedd9e14802b13b718d6b81d0f005d2f7a63"
+    "V32": "0eeda42610ed58e4429a4a7e0789dedd9e14802b13b718d6b81d0f005d2f7a63",
+    "V33": "41a0d8d98ce5e7313970a39dce34ca0b708464ec55bc388d0b1f4c7639473780"
   },
-  "last_run_at": "2026-06-19T14:33:13Z",
+  "last_run_at": "2026-06-19T15:14:08Z",
   "last_v_classifications": {
     "V1": "HOLD-SINCE-CLEAN",
     "V2": "HOLD-SINCE-CLEAN",
@@ -48,7 +49,7 @@
     "V9": "HOLD-SINCE-CLEAN",
     "V10": "HOLD-SINCE-CLEAN",
     "V11": "HOLD-SINCE-CLEAN",
-    "V12": "HOLD",
+    "V12": "HOLD-SINCE-CLEAN",
     "V13": "HOLD-SINCE-CLEAN",
     "V14": "HOLD-SINCE-CLEAN",
     "V15": "HOLD-SINCE-CLEAN",
@@ -68,7 +69,8 @@
     "V29": "HOLD-SINCE-CLEAN",
     "V30": "HOLD-SINCE-CLEAN",
     "V31": "HOLD-SINCE-CLEAN",
-    "V32": "HOLD-SINCE-CLEAN"
+    "V32": "HOLD-SINCE-CLEAN",
+    "V33": "HOLD"
   },
   "oversized_cell_ack": "9298ea32491343aeebf2d9eee76def65babb24d29df1a9d6b7923ffb4a948108"
 }
