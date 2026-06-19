@@ -15,6 +15,7 @@ Modes:
   emit-superseded — read SPEC.md, print prong-2 SUPERSEDED candidate set (closed §T whose §V cite resolves only into §V.retired). Prints `tid|superseded_v|original_cites`.
   emit-fold-seeds — read SPEC.md, print prong-1 fold-candidate seed set (live §V rows sharing a citer). Prints `cluster_members|co_citers`.
   emit-v-weights  — read SPEC.md, print prong-6 per-§V-row weight ranking + heavy-row set. Prints `v_row|bytes|tokens|cum_pct|heavy`.
+  emit-residue-candidates — read SPEC.md, print prong-4 freshness-contract residue candidates across live §V/§T/§B bodies. Prints `row|kind|pattern|line`.
   emit-row-ids    — read SPEC.md, print canonical live id-set skeleton (one `id||` row per live §V + §I + §T). Drift-detector fills verdicts against this.
   emit-overview   — read SPEC.md, print LOAD-step overview (all sections verbatim, §V as id-list only). §V bodies arrive via `emit-v-slices` to avoid double-load.
   --self-test     — run inline fixtures; exit 0 iff every assertion holds.
@@ -381,6 +382,47 @@ def emit_v_weights(v_rows):
     return ranked, total
 
 
+def emit_residue_candidates(v_rows, t_rows, b_rows):
+    """Condense-prong-4 candidate set: every live §V/§T/§B row body matching
+    the freshness-contract residue pattern set (amendment-counter `(∆)`,
+    dated-retirement `retired YYYY-MM-DD`, supersession-narration) — the
+    pattern set single-sourced by the freshness-contract invariant and
+    shared w/ the check skill history-residue audit via scan_residue_hits
+    (mechanical-realization invariant — no per-consumer regex paraphrase).
+    Pre-filters (backtick-wrapped tokens, cite-modifier §V.<n>(∆),
+    retired-in-place §V row) apply identically. Returns [{id, kind, pattern,
+    line}] sorted by (kind, id-num, pattern) so run-stable. The condenser
+    consumes the table instead of hand-grepping prose for recurrence-class
+    lineage, surfaced-by prose, etc."""
+    out = []
+    for kind, rows in (("V", v_rows), ("T", t_rows), ("B", b_rows)):
+        for r in rows:
+            for pattern, line in scan_residue_hits(
+                r["id"], r["body"] or "", r["line"], kind
+            ):
+                out.append(
+                    {
+                        "id": r["id"],
+                        "kind": kind,
+                        "pattern": pattern,
+                        "line": line,
+                    }
+                )
+
+    def id_num(tok):
+        return int(tok[1:])
+
+    pattern_order = {
+        "amendment-counter": 0,
+        "dated-retirement": 1,
+        "supersession-narration": 2,
+    }
+    out.sort(
+        key=lambda d: (d["kind"], id_num(d["id"]), pattern_order[d["pattern"]])
+    )
+    return out
+
+
 def parse_pipe_rows(sections, letter, pat):
     rows = []
     for lineno, line in sections.get(letter, []):
@@ -708,20 +750,35 @@ def oversized_cell_sha(cell_ids):
     return hashlib.sha256(",".join(sorted(set(cell_ids))).encode("utf-8")).hexdigest()
 
 
+def scan_residue_hits(rid, body, line, kind):
+    """Scan one row body against the freshness-contract residue pattern set
+    (HR_AMEND, HR_DATED, HR_SUPERSEDE + PF_* pre-filters). Returns list of
+    (pattern, line) tuples. Single source shared by audit_history_residue
+    (check skill) + emit_residue_candidates (condense prong 4) per the
+    mechanical-realization invariant — no regex paraphrase per consumer.
+    Patterns: amendment-counter, dated-retirement, supersession-narration.
+    Pre-filters: backtick-wrapped tokens (verbatim-preservation invariant),
+    cite-modifier §V.<n>(∆), retired-in-place §V row (wholesale-retired row
+    is reorganize archival job, not residue prune)."""
+    if kind == "V" and PF_RETIRED_INPLACE.match(f"{rid}: {body}"):
+        return []
+    residue = PF_CITE_MOD.sub("", strip_backticks(body))
+    hits = []
+    if HR_AMEND.search(residue):
+        hits.append(("amendment-counter", line))
+    if HR_DATED.search(residue):
+        hits.append(("dated-retirement", line))
+    if HR_SUPERSEDE.search(residue):
+        hits.append(("supersession-narration", line))
+    return hits
+
+
 def audit_history_residue(v_rows, t_rows, b_rows, full=False, oversized_ack=None):
     by_section = {"V": [], "T": [], "B": []}
 
     def scan(rid, body, line, kind):
-        # retired-in-place §V row exempt (pending reorganize archival)
-        if kind == "V" and PF_RETIRED_INPLACE.match(f"{rid}: {body}"):
-            return
-        residue = PF_CITE_MOD.sub("", strip_backticks(body))
-        if HR_AMEND.search(residue):
-            by_section[kind].append(("amendment-counter", rid, line))
-        if HR_DATED.search(residue):
-            by_section[kind].append(("dated-retirement", rid, line))
-        if HR_SUPERSEDE.search(residue):
-            by_section[kind].append(("supersession-narration", rid, line))
+        for pattern, hit_line in scan_residue_hits(rid, body, line, kind):
+            by_section[kind].append((pattern, rid, hit_line))
 
     for r in v_rows:
         scan(r["id"], r["body"], r["line"], "V")
@@ -1694,6 +1751,19 @@ def cmd_emit_v_weights(args):
     return 0
 
 
+def cmd_emit_residue_candidates(args):
+    text, _, _ = load_spec(args.repo_root, args.spec)
+    sections, _ = parse_sections(text)
+    v_rows = parse_v_rows(sections)
+    t_rows = parse_pipe_rows(sections, "T", T_ROW)
+    b_rows = parse_pipe_rows(sections, "B", B_ROW)
+    cands = emit_residue_candidates(v_rows, t_rows, b_rows)
+    print("row|kind|pattern|line")
+    for c in cands:
+        print(f"{c['id']}|{c['kind']}|{c['pattern']}|{c['line']}")
+    return 0
+
+
 def cmd_emit_row_ids(args):
     text, _, _ = load_spec(args.repo_root, args.spec)
     sections, _ = parse_sections(text)
@@ -2290,6 +2360,64 @@ def selftest():
         "v-weights: tie-break ascending id",
     )
 
+    # prong-4 residue candidates (freshness-contract pattern set, shared
+    # single-source regex w/ audit_history_residue via scan_residue_hits —
+    # mechanical-realization invariant; no per-consumer paraphrase).
+    # Each pattern fires once per matching row; pre-filters exempt backticks,
+    # cite-modifier §V.<n>(∆), retired-in-place §V row.
+    rv_amend = [{"id": f"V{8}", "body": "clause (∆) here", "line": 7}]
+    rt_dated = [{"id": f"T{9}", "body": ".|foo retired 2026-01-02 bar|V{1}", "line": 9}]
+    rb_super = [
+        {"id": f"B{4}", "body": "x|prior clause dropped", "last": "-", "line": 11}
+    ]
+    cand = emit_residue_candidates(rv_amend, rt_dated, rb_super)
+    cand_set = {(c["id"], c["kind"], c["pattern"], c["line"]) for c in cand}
+    check(
+        (f"V{8}", "V", "amendment-counter", 7) in cand_set
+        and (f"T{9}", "T", "dated-retirement", 9) in cand_set
+        and (f"B{4}", "B", "supersession-narration", 11) in cand_set,
+        "residue-candidates: each pattern fires per matching row",
+    )
+    # sort order: kind, then id-num, then pattern_order
+    check(
+        [c["kind"] for c in cand] == ["B", "T", "V"],
+        "residue-candidates: sort by kind (B, T, V)",
+    )
+    # backtick-wrapped pattern exempt (verbatim-preservation invariant)
+    bt = [{"id": f"V{8}", "body": "pattern `\\bretired \\d{4}-\\d{2}-\\d{2}\\b`", "line": 1}]
+    check(
+        emit_residue_candidates(bt, [], []) == [],
+        "residue-candidates: backtick-wrapped pattern exempt",
+    )
+    # cite-modifier exempt
+    cm = [{"id": f"V{8}", "body": f"per §V.{94}(∆) amend", "line": 1}]
+    check(
+        emit_residue_candidates(cm, [], []) == [],
+        "residue-candidates: cite-modifier exempt",
+    )
+    # retired-in-place §V row exempt (wholesale-retired row is reorganize job)
+    rip = [{"id": f"V{95}", "body": "retired 2026-06-03 — moot", "line": 1}]
+    check(
+        emit_residue_candidates(rip, [], []) == [],
+        "residue-candidates: retired-in-place §V row exempt",
+    )
+    # empty rows → empty candidates
+    check(
+        emit_residue_candidates([], [], []) == [],
+        "residue-candidates: empty inputs → empty",
+    )
+    # multi-pattern single row → multiple hits
+    multi = [
+        {"id": f"T{7}", "body": ".|stale (∆) clause retired 2026-01-02|V{1}", "line": 3}
+    ]
+    multi_cand = emit_residue_candidates([], multi, [])
+    check(
+        len(multi_cand) == 2
+        and {c["pattern"] for c in multi_cand}
+        == {"amendment-counter", "dated-retirement"},
+        "residue-candidates: multi-pattern row yields multiple hits",
+    )
+
     # emit-row-ids: §I ids from kind prefixes; skeleton is §V+§I+§T in order
     isec = (
         "## §I INTERFACES\n"
@@ -2845,7 +2973,7 @@ def selftest():
 
 def _selftest_count():
     # informational; kept in sync loosely with the check() calls above
-    return 158
+    return 165
 
 
 # --- entry -------------------------------------------------------------------
@@ -2870,6 +2998,7 @@ def main(argv=None):
             "emit-row-ids",
             "emit-overview",
             "emit-token-estimate",
+            "emit-residue-candidates",
         ],
     )
     parser.add_argument("--repo-root", default=os.environ.get("CHECK_REPO_ROOT", "."))
@@ -2908,6 +3037,8 @@ def main(argv=None):
         return cmd_emit_fold_seeds(args)
     if args.mode == "emit-v-weights":
         return cmd_emit_v_weights(args)
+    if args.mode == "emit-residue-candidates":
+        return cmd_emit_residue_candidates(args)
     if args.mode == "emit-row-ids":
         return cmd_emit_row_ids(args)
     if args.mode == "emit-overview":
