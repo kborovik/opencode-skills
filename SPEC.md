@@ -66,7 +66,7 @@ T5|x|move `install.sh` from `scripts/` to repo root; refresh bootstrap URL + tes
 T6|x|add `commands/sdd-explain.md` — slash command mirroring explain skill (description-only frontmatter distilled from `skills/explain/SKILL.md`, body delegates via `invoke the explain skill $ARGUMENTS`) per V9 response-shape contract|I.cmd,V9
 T7|x|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `commands/`) + single-script symlink w/ iteration over each entry in `<clone>/skills/*`, `<clone>/commands/*`, `<clone>/scripts/*` → per-file symlink via existing `link()` helper; preserves idempotency + `curl|sh` bootstrap|I.script,V26
 T8|x|fix `scripts/check-mechanical.py` `emit-row-ids` §I extraction — drops hyphenated kinds (`renumber-map`, `check-state`); V13 regex single source of truth|V13
-T9|. |fix `scripts/check-mechanical.py` `is_user_invocable` YAML 1.2 block-scalar parsing — strip indent from `description: |` continuation lines, prefix-match `Internal` on any continuation line; covers §B.1 + §B.2 false-positive MISSING|I.script,V10,B15
+T9|x |fix `scripts/check-mechanical.py` `is_user_invocable` YAML 1.2 block-scalar parsing — strip indent from `description: |` continuation lines, prefix-match `Internal` on any continuation line; covers §B.1 + §B.2 false-positive MISSING|I.script,V10,B15
 
 ## §B BUGS
 id|date|cause|fix

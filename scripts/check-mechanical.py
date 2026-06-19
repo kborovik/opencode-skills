@@ -890,19 +890,43 @@ def parse_frontmatter(text):
 
 
 def is_user_invocable(text):
-    """A SKILL.md is user-invocable unless its frontmatter description starts
-    with "Internal — not for direct invocation" (sub-skill-flags invariant —
-    auto-fire sub-skills are flagged in the description). Frontmatter-only so
-    a body mention of the description never flips the verdict."""
+    """A SKILL.md is user-invocable unless its frontmatter description opens
+    with "Internal — not for direct invocation" (sub-skill-flags invariant V10
+    — auto-fire sub-skills are flagged in the description; closes §B.15).
+    Frontmatter-only so a body mention of the description never flips the
+    verdict (verbatim-preservation invariant V22).
+
+    YAML 1.2 block-scalar handling: when `description: |` (or `>`) opens a
+    multi-line block, the flag lives on the first non-empty continuation
+    line. Block indent = first non-blank continuation line's indent; dedent
+    ends the block; blank lines inside the block are skipped (verbatim
+    preservation invariant — multi-line `|` blocks routinely include
+    intentional blanks between paragraphs).
+    """
     fm = parse_frontmatter(text)
-    for line in fm.splitlines():
-        if line.lower().startswith("description:"):
-            desc = line[len("description:") :].strip()
-            if desc.startswith("Internal — not for direct invocation"):
-                return False
-            # Handle multi-line description (YAML | block or continued lines)
+    lines = fm.splitlines()
+    for i, line in enumerate(lines):
+        if not line.lower().startswith("description:"):
+            continue
+        value = line[len("description:") :].strip()
+        if value.startswith("Internal — not for direct invocation"):
+            return False
+        if value.startswith("|") or value.startswith(">"):
+            block_indent = None
+            for cont in lines[i + 1 :]:
+                if not cont.strip():
+                    continue
+                cur_indent = len(cont) - len(cont.lstrip())
+                if block_indent is None:
+                    block_indent = cur_indent
+                if cur_indent < block_indent:
+                    return True
+                if cont[block_indent:].startswith(
+                    "Internal — not for direct invocation"
+                ):
+                    return False
             return True
-    # No description field found → user-invocable by default
+        return True
     return True
 
 
@@ -931,11 +955,15 @@ def extract_mechanize_block(text):
     return "\n".join(block)
 
 
-def classify_mechanize_blocks(skill_texts):
-    """Mechanize-block audit core over {path: text} — pure, unit-testable without
-    the filesystem (mechanize-scan + mechanical-realization invariants). The
-    user-invocable set is the input minus frontmatter `user-invocable: false`
-    (auto-fire sub-skills). Emits MISSING for a user-invocable skill lacking the
+def classify_mechanize_blocks(skill_texts, command_names=None):
+    """Mechanize-block audit core over {path: text} — pure, unit-testable
+    without the filesystem (mechanize-scan V14 + mechanical-realization V13
+    invariants; closes §B.1 + §B.2). The audit set is user-invocable skills
+    whose corresponding slash command exists (`commands/sdd-<name>.md`) —
+    MECHANIZE block inapplicable when no command dispatch follows (exempts
+    internal sub-skills per V10 + the `commit` skill per V9 no-dispatch
+    exception). When `command_names` is None, fall back to `is_user_invocable`
+    only (legacy test mode). Emits MISSING for an audit-set skill lacking the
     MECHANIZE sentinel, DRIFT for a block diverging from the set's canonical
     (majority) md5. Uniform set → no rows (clean, silent). < 2 blocks → no
     comparison possible, no rows."""
@@ -945,6 +973,10 @@ def classify_mechanize_blocks(skill_texts):
         txt = skill_texts[path]
         if not is_user_invocable(txt):
             continue
+        if command_names is not None:
+            name = os.path.basename(os.path.dirname(path))
+            if name not in command_names:
+                continue
         block = extract_mechanize_block(txt)
         if block is None:
             out.append(
@@ -982,18 +1014,38 @@ def classify_mechanize_blocks(skill_texts):
     return out
 
 
-def audit_mechanize_block(skill_md):
-    """File-reading wrapper around classify_mechanize_blocks (mechanize-scan +
-    mechanical-realization invariants). Asserts every user-invocable
-    `skills/*/SKILL.md` carries the byte-identical canonical MECHANIZE block —
-    realized once here, retiring the hand-run `awk|md5|uniq` verbatim check."""
+def discover_command_names(repo_root):
+    """Slash-command names: `commands/sdd-*.md` → `{basename minus sdd-}`.
+    Feeds the MECHANIZE audit's `user-invocable + has command` filter (V14 —
+    MECHANIZE block inapplicable when no command dispatch follows; closes
+    §B.2 false-positive on `commit`, which has no `sdd-commit` command per V9
+    no-dispatch exception)."""
+    cmds_dir = os.path.join(repo_root, "commands")
+    out = set()
+    if not os.path.isdir(cmds_dir):
+        return out
+    for fn in sorted(os.listdir(cmds_dir)):
+        if fn.startswith("sdd-") and fn.endswith(".md"):
+            out.add(fn[len("sdd-") : -len(".md")])
+    return out
+
+
+def audit_mechanize_block(skill_md, repo_root=None):
+    """File-reading wrapper around classify_mechanize_blocks (mechanize-scan V14
+    + mechanical-realization V13 invariants). Asserts every user-invocable
+    `skills/*/SKILL.md` whose corresponding slash command exists carries the
+    byte-identical canonical MECHANIZE block — realized once here, retiring
+    the hand-run `awk|md5|uniq` verbatim check. Skills without a slash command
+    (`commit` per V9 + internal sub-skills per V10) are excluded from the
+    audit set per V14 (closes §B.1 + §B.2)."""
     texts = {}
     for path in skill_md:
         try:
             texts[path] = read_text(path)
         except OSError:
             continue
-    return classify_mechanize_blocks(texts)
+    cmd_names = discover_command_names(repo_root) if repo_root else None
+    return classify_mechanize_blocks(texts, cmd_names)
 
 
 # --- dispatch-target audit ---------------------------------------------------
@@ -1623,7 +1675,7 @@ def run_audit(repo_root, spec_path, run_hook=True, full=False):
     published_md = discover_published_md(repo_root)
     findings += audit_pinned_header(published_md)
     skill_md = discover_skill_md(repo_root)
-    findings += audit_mechanize_block(skill_md)
+    findings += audit_mechanize_block(skill_md, repo_root=repo_root)
     findings += audit_dispatch_targets(skill_md)
     findings += audit_grants(discover_grant_skills(repo_root))
     findings += audit_batch_advisory(v_rows, published_md)
@@ -2409,6 +2461,45 @@ def selftest():
         is False,
         "is_user_invocable: description prefix → false",
     )
+    # V10 — YAML 1.2 block-scalar `description: |` opens multi-line block; the
+    # `Internal — not for direct invocation` flag lives on the first non-blank
+    # continuation line (stripped of block indent). Closes §B.15 (5 internal
+    # sub-skills + commit false-positive MISSING before the fix).
+    bs_internal = _mk(
+        "description: |\n  Internal — not for direct invocation. Bug → spec protocol.\n  Continuation line.\n"
+    )
+    check(
+        is_user_invocable(bs_internal) is False,
+        "is_user_invocable: YAML | block with Internal prefix → false (V10, §B.15)",
+    )
+    bs_user = _mk(
+        "description: |\n  Commit staged changes with a Conventional Commits message.\n  Inspects the index.\n"
+    )
+    check(
+        is_user_invocable(bs_user) is True,
+        "is_user_invocable: YAML | block without Internal prefix → true (V10, §B.15)",
+    )
+    bs_internal_blank = _mk(
+        "description: |\n\n  Internal — not for direct invocation. After blank.\n"
+    )
+    check(
+        is_user_invocable(bs_internal_blank) is False,
+        "is_user_invocable: YAML | block blank line before Internal prefix → false (V10)",
+    )
+    bs_internal_fold = _mk(
+        "description: >\n  Internal — not for direct invocation.\n  Folded continuation.\n"
+    )
+    check(
+        is_user_invocable(bs_internal_fold) is False,
+        "is_user_invocable: YAML > folded block with Internal prefix → false (V10)",
+    )
+    bs_dedent = _mk(
+        "description: |\n  Internal — not for direct invocation. First line.\nlicense: MIT\n"
+    )
+    check(
+        is_user_invocable(bs_dedent) is False,
+        "is_user_invocable: YAML | block, sibling key at column 0 dedents → flag caught (V10)",
+    )
     body_mention = _mk(
         block="## MECHANIZE — scan\n\nmentions `Internal — not for direct invocation` in prose\n\n- rule a\n- rule b\n"
     )
@@ -2469,6 +2560,35 @@ def selftest():
     check(
         classify_mechanize_blocks({"a/SKILL.md": _mk()}) == [],
         "mechanize: single block → no divergence possible",
+    )
+    # V14 — MECHANIZE audit set = user-invocable ∧ has slash command
+    # (`commands/sdd-<name>.md`). Skills without a command (e.g. `commit` per
+    # V9 no-dispatch exception) are excluded; a skill lacking a MECHANIZE
+    # block but lacking a command does NOT emit MISSING (closes §B.2).
+    check(
+        classify_mechanize_blocks(
+            {
+                "a/SKILL.md": _mk(),
+                "commit/SKILL.md": _mk(block="## OTHER\n\nx\n"),
+            },
+            command_names={"a"},
+        )
+        == [],
+        "mechanize: user-invocable skill w/o slash command excluded from audit set (V14, §B.2)",
+    )
+    # V14 — when `command_names` is supplied, MISSING fires only on audit-set
+    # skills lacking the block (a here has no block and is in command_names;
+    # commit has no block but lacks a slash command so is excluded).
+    mr_v14 = classify_mechanize_blocks(
+        {
+            "a/SKILL.md": _mk(block="## OTHER\n\nx\n"),
+            "commit/SKILL.md": _mk(block="## OTHER\n\nx\n"),
+        },
+        command_names={"a"},
+    )
+    check(
+        len(mr_v14) == 1 and mr_v14[0][1] == "MISSING" and "a/SKILL.md" in mr_v14[0][2],
+        "mechanize: command_names filter scopes MISSING to audit set (V14)",
     )
     # DRIFT + MISSING make the run dirty; pseudo-id row unrestricted vocab
     check(
@@ -2695,7 +2815,7 @@ def selftest():
 
 def _selftest_count():
     # informational; kept in sync loosely with the check() calls above
-    return 154
+    return 149
 
 
 # --- entry -------------------------------------------------------------------
