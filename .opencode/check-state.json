@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "last_clean_sha": "91954e9fdd3a5897334a186b4286b2c6d5131bbe",
+  "last_clean_sha": "afab2ea6f0adf69f6f7b7c097de322821973f540",
   "v_row_shas": {
     "V1": "93d870fce94b7cdfa03119b8f154459626d6a78fd94d52f9e0edbe76e6e4679a",
     "V2": "7af8e695b530ce00160ec26c25f4fa01e01c073d33350768b5e9330d70deb949",
@@ -13,7 +13,7 @@
     "V9": "17c842c7013602cc0630565aa54bd725159f571b3dffa756cc3735c6b17547e4",
     "V10": "d21942410a52d38f8be60fae6f4f231a6bd774122df3df6f5721854a164c77f9",
     "V11": "e7cb55628e771fee5c4d5df93afafa8ad1c56ef51023a9d131edf6c92715b139",
-    "V12": "41f55d41176340643de7e80dbdc8806fef31c9084ca098418278c5e6a3900042",
+    "V12": "7b28774ea376d038f3462da1d16c9897c01e852915e988bc8f8e30fe47af6b79",
     "V13": "5c4408ee1fd79adad4311f6c7169c4d743969926b90f659b3b9e9b141be2c969",
     "V14": "675ce19657ffae68e2875bfba29cbc20c704634f37bdf3496323e55f3aa38887",
     "V15": "cef98e0d55111fa6451bfcebbb75589d1d338fd402573e6a244c781b5a84c56a",
@@ -35,7 +35,7 @@
     "V31": "0b35c110dcdc687f928449ee7bdbb0882be2aecade5bd6d96397a2f15c1c6b1c",
     "V32": "0eeda42610ed58e4429a4a7e0789dedd9e14802b13b718d6b81d0f005d2f7a63"
   },
-  "last_run_at": "2026-06-19T01:23:54Z",
+  "last_run_at": "2026-06-19T14:33:13Z",
   "last_v_classifications": {
     "V1": "HOLD-SINCE-CLEAN",
     "V2": "HOLD-SINCE-CLEAN",
@@ -46,11 +46,11 @@
     "V7": "HOLD-SINCE-CLEAN",
     "V8": "HOLD-SINCE-CLEAN",
     "V9": "HOLD-SINCE-CLEAN",
-    "V10": "HOLD",
+    "V10": "HOLD-SINCE-CLEAN",
     "V11": "HOLD-SINCE-CLEAN",
     "V12": "HOLD",
-    "V13": "HOLD",
-    "V14": "HOLD",
+    "V13": "HOLD-SINCE-CLEAN",
+    "V14": "HOLD-SINCE-CLEAN",
     "V15": "HOLD-SINCE-CLEAN",
     "V16": "HOLD-SINCE-CLEAN",
     "V17": "HOLD-SINCE-CLEAN",
@@ -68,7 +68,7 @@
     "V29": "HOLD-SINCE-CLEAN",
     "V30": "HOLD-SINCE-CLEAN",
     "V31": "HOLD-SINCE-CLEAN",
-    "V32": "HOLD"
+    "V32": "HOLD-SINCE-CLEAN"
   },
-  "oversized_cell_ack": "abdbc2b5cc2c7a519b72bf7a164c58ebf892ab0c2df6468213705cc2f0da8561"
+  "oversized_cell_ack": "9298ea32491343aeebf2d9eee76def65babb24d29df1a9d6b7923ffb4a948108"
 }
