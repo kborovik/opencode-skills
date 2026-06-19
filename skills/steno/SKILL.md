@@ -47,6 +47,7 @@ Every prose sentence or bullet body:
 2. **Visible subject-verb** — subject explicit or imperative (`Add X.` OK). No symbol-chain fragments: `auth → mw → handler` → `Auth middleware runs before the handler.`
 3. **No hidden copulas** — elide `is`/`are` only when fragment unambiguous. Drop copula in `X — Y` only when Y reads as predicate, not apposition.
 4. **≤ 1 participial phrase per sentence** — nesting kills first-clause readability.
+5. **Cite at tail** — end sentence w/ spec citation (`§V.<n>`, `§T.<n>`) or issue/PR ref (`#123`); not open or build sentence on cite. Write "Spell out symbols per the symbol-set invariant", not "The symbol-set invariant says to spell out symbols".
 
 Verb-headed fragments fine. Lists > paragraphs. One idea per line in lists. Break long sentences before cutting words.
 
@@ -64,6 +65,10 @@ Safe for GitHub readers:
 ```
 
 No other symbols — math operators beyond this set → write the word; mirrors telegraph symbol policy.
+
+## ACRONYMS
+
+Spell out full term on first use, acronym in parentheses: spec-driven development (SDD). Common web/protocol acronyms exempt (use bare from first occurrence): `API`, `URL`, `JSON`, `HTTP`, `JWT`. Spell out domain acronyms unique to the repo or skill pack on first use.
 
 ## PRESERVE VERBATIM
 
@@ -141,3 +146,7 @@ Exclusions:
 - Colloquial sentence structure — allowed where it aids reviewer flow; register applies at word level.
 - Domain-load-bearing named ops (`backprop`, `telegraph-encode`, `socratic`, `steno`).
 - Established tech vocab doubling as metaphor (`drift`, `bottleneck`, `leak`) — allowed when standard term in context.
+
+## OPERATOR CHOICE
+
+When the operator asks you to decide, state the choice in one sentence, list options plainly (one line each), recommend one option in one sentence. Do not end w/ prose "or keep going?" question — same-turn choice is a gate, not a sentence. Matches decision-gate invariant posture: AskUserQuestion gates irrecoverable branches; prose trailing-question gate is ambiguous signal, not a gate.
