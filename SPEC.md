@@ -15,7 +15,7 @@ SDD skill pack for opencode — author, build, check, condense, design, reorgani
 ## §I INTERFACES
 - skill: `skills/<name>/SKILL.md` → 13 skills (spec, build, check, condense, design, reorganize, explain, commit, backprop, socratic, steno, telegraph, monitor)
 - cmd: `commands/sdd-*.md` → 7 slash commands (sdd-spec, sdd-build, sdd-check, sdd-condense, sdd-design, sdd-reorganize, sdd-explain)
-- script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `emit-overview`, `emit-v-slices`, `emit-superseded`, `emit-row-ids`, `write-memo`, `--self-test`; deployed `~/.opencode/scripts/`
+- script: `scripts/check-mechanical.py` → mechanical audit core; subcmds `audit`, `write-memo`, `emit-v-slices`, `emit-superseded`, `emit-fold-seeds`, `emit-v-weights`, `emit-row-ids`, `emit-overview`, `emit-token-estimate`; flag `--self-test`; deployed `~/.opencode/scripts/`
 - script: `install.sh` → global deploy: `git clone` to `~/.local/share/opencode-skills/` (skip if exists) + per-file symlink for each `<clone>/skills/<name>` → `~/.config/opencode/skills/<name>`, `<clone>/commands/<name>` → `~/.config/opencode/commands/<name>`, `<clone>/scripts/<name>` → `~/.opencode/scripts/<name>`; idempotent re-run, `curl | sh` bootstrap supported
 - format: `skills/spec/SPEC-FORMAT.md` → structural format reference (row schemas, section catalog, citation forms, archive sibling); consumed by spec/check/condense/reorganize via direct Read
 - spec: `SPEC.md` @ repo root → sole live spec; authored by spec skill only
