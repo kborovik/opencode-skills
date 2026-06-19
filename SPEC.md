@@ -71,7 +71,7 @@ T7|x|per-file symlinks in install.sh — replace bulk dir-symlinks (`skills/`, `
 T8|x|fix `scripts/check-mechanical.py` `emit-row-ids` §I extraction — drops hyphenated kinds (`renumber-map`, `check-state`); V13 regex single source of truth|V13
 T9|x |fix `scripts/check-mechanical.py` `is_user_invocable` YAML 1.2 block-scalar parsing — strip indent from `description: |` continuation lines, prefix-match `Internal` on any continuation line; covers §B.1 + §B.2 false-positive MISSING|I.script,V10,B15
 T10|x|extend `scripts/check-mechanical.py` PUBLISHED discovery — `skill_pack_source_dirs`, `plugin_names`, `discover_skill_md` walk `.opencode/skills/*/SKILL.md` in addition to `skills/*/SKILL.md`; census union for MECHANIZE/dispatch/pinned-cite/batch audits|V12,V13
-T11|.|author `.opencode/skills/release/SKILL.md` — `gh release create` wrapper; tag = `git describe --tags` then bump (patch default, minor/major via AskUserQuestion per §V.23); notes = `git log <last-tag>..HEAD` conventional-commit subjects grouped by type; AskUserQuestion gate pre-create; body telegraph; MECHANIZE + `## Next` blocks per §V.9,§V.14|V9,V12,V14,V23,V26
+T11|x|author `.opencode/skills/release/SKILL.md` — `gh release create` wrapper; tag = `git describe --tags` then bump (patch default, minor/major via AskUserQuestion per §V.23); notes = `git log <last-tag>..HEAD` conventional-commit subjects grouped by type; AskUserQuestion gate pre-create; body telegraph; MECHANIZE + `## Next` blocks per §V.9,§V.14|V9,V12,V14,V23,V26
 T12|.|add `.opencode/commands/sdd-release.md` — thin wrapper, frontmatter description distilled from release SKILL.md, body `invoke the release skill: $ARGUMENTS`|V9
 
 ## §B BUGS
