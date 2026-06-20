@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "last_clean_sha": "bff08df35771672717656713637187a74356edf6",
+  "last_clean_sha": "57110be19b84151980cc720f1c36963d75565651",
   "v_row_shas": {
     "V1": "93d870fce94b7cdfa03119b8f154459626d6a78fd94d52f9e0edbe76e6e4679a",
     "V2": "7af8e695b530ce00160ec26c25f4fa01e01c073d33350768b5e9330d70deb949",
@@ -35,9 +35,9 @@
     "V31": "0b35c110dcdc687f928449ee7bdbb0882be2aecade5bd6d96397a2f15c1c6b1c",
     "V32": "0eeda42610ed58e4429a4a7e0789dedd9e14802b13b718d6b81d0f005d2f7a63",
     "V33": "46bf016aa0e6d418a3520a22e5f7791d1872ecd8fae0b43dc74d6337143b51d3",
-    "V34": "d0bada566e1ae058dffce96fb49c93c6e1dc08cc31ca31020ff6828fd05447f3"
+    "V34": "651b20624bf1c26671a102f39cf013e204abc66efb83e9b53e69ef22bdf5c31a"
   },
-  "last_run_at": "2026-06-19T23:15:22Z",
+  "last_run_at": "2026-06-20T01:24:35Z",
   "last_v_classifications": {
     "V1": "HOLD-SINCE-CLEAN",
     "V2": "HOLD-SINCE-CLEAN",
@@ -72,7 +72,7 @@
     "V31": "HOLD-SINCE-CLEAN",
     "V32": "HOLD-SINCE-CLEAN",
     "V33": "HOLD",
-    "V34": "HOLD-SINCE-CLEAN"
+    "V34": "HOLD"
   },
   "oversized_cell_ack": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 }
