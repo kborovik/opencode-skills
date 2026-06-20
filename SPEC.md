@@ -77,7 +77,7 @@ T11|x|author `.opencode/skills/release/SKILL.md` — `gh release create` wrapper
 T12|x|add `.opencode/commands/sdd-release.md` — thin wrapper, frontmatter description distilled from release SKILL.md, body `invoke the release skill: $ARGUMENTS`|V9
 T13|x|add `scripts/check-mechanical.py` `emit-residue-candidates` mode — scan live §V/§T/§B bodies against V3 freshness-contract residue pattern set; emit candidate rows; single-sources regex shared w/ check audit + condense prong 4|V3,V13
 T14|x|update `.opencode/skills/release/SKILL.md` — add push-precondition step before CREATE: verify local HEAD synced with upstream (`git rev-parse HEAD` vs `git rev-parse @{u}`), push if ahead, abort on divergence/uncommitted; cite V34|V34
-T15|.|update `.opencode/skills/release/SKILL.md` SYNC section — replace branch-only push-ahead with step #1 bidirectional sync: push + pull commits + tags, assert `git ls-remote --heads --tags` == local refs, abort on divergence/dirty tree; cite V34|V34
+T15|x|update `.opencode/skills/release/SKILL.md` SYNC section — replace branch-only push-ahead with step #1 bidirectional sync: push + pull commits + tags, assert `git ls-remote --heads --tags` == local refs, abort on divergence/dirty tree; cite V34|V34
 
 ## §B BUGS
 id|date|cause|fix

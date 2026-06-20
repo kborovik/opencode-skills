@@ -58,29 +58,37 @@ Operator selects → proceed. Cancel → stop, no `gh` call, no tag mutation.
 
 Release-sync-precondition (per §V.<n>) — fires after GATE approval, before
 CREATE. Published tag points at the commit `gh release create` resolves on the
-remote; if local HEAD is ahead of upstream, the tag lands on the stale remote
-HEAD while release notes (drafted from local `git log`) cover unpushed
-commits — release contents and notes diverge. Guard:
+remote; release notes (drafted from local `git log`) must match release
+contents. Bidirectional sync — push local commits + tags upstream AND pull
+upstream commits + tags local — so `git ls-remote --heads --tags` ref set
+equals the local ref set. Guard:
 
 1. Resolve upstream branch: `git rev-parse --abbrev-ref @{u}`. No upstream
    configured (new branch, bare clone w/o tracking) → AskUserQuestion, header
    `Push-target fallback`, confirm the `<remote>/<branch>` to push; operator
    may cancel.
-2. Compare `git rev-parse HEAD` vs `git rev-parse @{u}`:
-   - equal → synced; proceed to CREATE.
-   - local ahead → `git push <remote> <branch>`; on push failure (rejected
-     non-fast-forward, auth) → abort w/ "push failed; resolve then re-invoke".
-   - local behind or diverged → abort w/ "local and upstream diverged;
-     rebase/merge, re-invoke after sync".
-3. Uncommitted working tree (`git status --porcelain` non-empty) → abort w/
+2. Uncommitted working tree (`git status --porcelain` non-empty) → abort w/
    "working tree dirty; commit or stash, re-invoke". `gh release create` tags
    HEAD regardless of working-tree state so dirty tree does not corrupt the
    tag, but a dirty tree usually means the operator has unfinished work that
    should not ship under the release commit; the guard surfaces this pre-tag.
+3. Push local commits + tags: `git push <remote> <branch>` then
+   `git push <remote> --tags`. On push failure (rejected non-fast-forward,
+   auth) → abort w/ "push failed; resolve then re-invoke".
+4. Pull upstream commits + tags: `git pull --ff-only <remote> <branch>` then
+   `git fetch <remote> --tags`. On pull failure (non-fast-forward, diverged
+   history) → abort w/ "local and upstream diverged; rebase/merge, re-invoke
+   after sync".
+5. Assert ref-set equality: `git ls-remote --heads --tags <remote>` output
+   equals local refs (`git for-each-ref --format='%(refname)' refs/heads
+   refs/tags` after stripping the `<remote>/` prefix from remote side).
+   Mismatch → abort w/ "ref-set mismatch; reconcile then re-invoke".
 
-Tag push not done here — `gh release create` is the publish act and pushes the
-tag itself; SYNC pushes the branch only so the tag points at a commit upstream
-already has.
+SYNC pushes the branch + tags so `gh release create` resolves the tag at a
+commit upstream already has, and pulls so local HEAD matches what will be
+published. `gh release create` remains the publish act (and pushes the release
+object); SYNC guarantees the local view of upstream matches the published
+view before the irrecoverable tag lands.
 
 ## NOTES
 
