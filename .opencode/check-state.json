@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "last_clean_sha": "57110be19b84151980cc720f1c36963d75565651",
+  "last_clean_sha": "a8298123f32cbc36443aec6a803b91fbb0d155a5",
   "v_row_shas": {
     "V1": "93d870fce94b7cdfa03119b8f154459626d6a78fd94d52f9e0edbe76e6e4679a",
     "V2": "7af8e695b530ce00160ec26c25f4fa01e01c073d33350768b5e9330d70deb949",
@@ -37,7 +37,7 @@
     "V33": "46bf016aa0e6d418a3520a22e5f7791d1872ecd8fae0b43dc74d6337143b51d3",
     "V34": "651b20624bf1c26671a102f39cf013e204abc66efb83e9b53e69ef22bdf5c31a"
   },
-  "last_run_at": "2026-06-20T01:24:35Z",
+  "last_run_at": "2026-06-22T01:42:48Z",
   "last_v_classifications": {
     "V1": "HOLD-SINCE-CLEAN",
     "V2": "HOLD-SINCE-CLEAN",
@@ -71,8 +71,8 @@
     "V30": "HOLD-SINCE-CLEAN",
     "V31": "HOLD-SINCE-CLEAN",
     "V32": "HOLD-SINCE-CLEAN",
-    "V33": "HOLD",
-    "V34": "HOLD"
+    "V33": "HOLD-SINCE-CLEAN",
+    "V34": "HOLD-SINCE-CLEAN"
   },
   "oversized_cell_ack": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 }
